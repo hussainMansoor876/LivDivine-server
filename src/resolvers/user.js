@@ -56,17 +56,97 @@ export default {
   Mutation: {
     signUp: async (
       parent,
-      { username, email, password },
+      { username, email, password, isVerified },
       { models, secret },
     ) => {
-      const user = await models.User.create({
-        username,
-        email,
-        password,
-      });
 
-      return { token: createToken(user, password, '30m') };
+      var newUser = await models.User.find({
+        where: {
+          email: email,
+        },
+      });
+      if (newUser) {
+        if (newUser.isVerified === false) {
+          const user = await models.User.findById(newUser.id);
+          var pass = password;
+
+          const saltRounds = 10;
+          password = await bcrypt.hash(pass, saltRounds);
+
+          await user.update({
+            username,
+            password,
+            isLogin: false
+          });
+          return { token: createToken(user, password, '30m') };
+
+        } else {
+          throw new UserInputError(
+            'Email already in Use! Please SignIn.',
+          );
+        }
+
+      } else {
+        const user1 = await models.User.create({
+          username,
+          email,
+          password,
+          isVerified,
+          isLogin: false
+        });
+
+        return { token: createToken(user1, password, '30m') };
+
+      }
     },
+
+    socialSignUp: async (
+      parent,
+      { username, email, authType, isVerified },
+      { models, secret },
+    ) => {
+      var newUser = await models.User.findOne({
+        where: {
+          email: email,
+        },
+        attributes: { exclude: ['password'] }
+      });
+      if (newUser) {
+        if (newUser.isVerified === false) {
+          const user = await models.User.findById(newUser.id);
+          // var pass = password;
+
+          // const saltRounds = 10;
+          // password = await bcrypt.hash(pass, saltRounds);
+
+          await user.update({
+            username,
+            isLogin: true,
+            authType
+            // password,
+          });
+          return { token: JSON.stringify(newUser) };
+
+        } else {
+          return { token: JSON.stringify(newUser) };
+        }
+
+      } else {
+        let newUser1 = await models.User.create({
+          username,
+          email,
+          isVerified,
+          isLogin: true,
+          authType
+        }, {
+          attributes: { exclude: ['password'] }
+        })
+
+        return { token: JSON.stringify(newUser1) };
+
+      }
+    },
+
     forgotPassword: async (
       parent,
       { email, password, optp },
@@ -82,40 +162,33 @@ export default {
           'No user found with this Email.',
         );
       }
-      var _optp =Math.floor(
+      var _optp = Math.floor(
         Math.random() * (9999 - 1000 + 1) + 1000
       );
-      
+
       if (optp == null || optp == '' || optp == undefined) {
 
         optp = _optp;
         sendOptpEmail(user, _optp);
         await user.update({ optp });
-      }else{
+      } else {
         if (user.optp != optp) {
           throw new UserInputError(
             'Optp Not Matched',
           );
-        }else{
-          var asd = password;
-
-          console.log("");
+        } else {
+          var pass = password;
           const saltRounds = 10;
-          password = await bcrypt.hash(asd, saltRounds);
-          console.log('password',password);
+          password = await bcrypt.hash(pass, saltRounds);
           await user.update({ password });
         }
-        
-        
       }
-      
-
-      return { token: "sdsadas" };
+      return { token: createToken(user, password, '30m') };
     },
 
     signIn: async (
       parent,
-      { login, password },
+      { login, password, isLogin },
       { models, secret },
     ) => {
       const user = await models.User.findByLogin(login);
@@ -131,17 +204,92 @@ export default {
       if (!isValid) {
         throw new AuthenticationError('Invalid password.');
       }
+      await user.update({
+        isLogin: true,
+      });
 
       return { token: createToken(user, password, '30m') };
     },
 
     updateUser: combineResolvers(
-      isAuthenticated,
-      async (parent, { username }, { models, me }) => {
-        const user = await models.User.findById(me.id);
-        return await user.update({ username });
+      // isAuthenticated,
+      async (
+        parent,
+        body,
+        { models, me }) => {
+        var newUser = await models.User.find({
+          where: {
+            email: body.email,
+            isVerified: true
+          },
+        });
+        if (!newUser) {
+          throw new UserInputError(
+            'No user found with this Email.',
+          );
+        }
+        const user = await models.User.findById(newUser.id);
+        return await user.update(body);
       },
     ),
+
+
+    updatePassword: combineResolvers(
+      // isAuthenticated,
+      async (
+        parent,
+        { email, password },
+        { models, me }) => {
+        var newUser = await models.User.find({
+          where: {
+            email: email, isVerified: true
+          },
+        });
+        if (!newUser) {
+          throw new UserInputError(
+            'No user found with this Email.',
+          );
+        }
+        const user = await models.User.findById(newUser.id);
+        var pass = password;
+
+        const saltRounds = 10;
+        password = await bcrypt.hash(pass, saltRounds);
+        return await user.update({ password });
+      },
+    ),
+
+    updateVerified: combineResolvers(
+      // isAuthenticated,
+      async (
+        parent,
+        { email, isVerified },
+        { models, me }) => {
+        var newUser = await models.User.find({
+          where: {
+            email: email,
+          },
+        });
+        if (newUser) {
+          if (newUser.isVerified === false) {
+            const user = await models.User.findById(newUser.id);
+            return await user.update({ isVerified });
+          }
+          else {
+            throw new UserInputError(
+              'Email is already verified! Please Login...',
+            );
+          }
+        }
+        else {
+          throw new UserInputError(
+            'No user found with this Email.',
+          );
+        }
+
+      },
+    ),
+
 
     deleteUser: combineResolvers(
       isAdmin,
@@ -162,4 +310,10 @@ export default {
       });
     },
   },
+
+
 };
+
+
+
+

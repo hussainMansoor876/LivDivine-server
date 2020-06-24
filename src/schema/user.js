@@ -11,12 +11,15 @@ export default gql`
     signUp(
       username: String!
       email: String!
-      password: String!
+      password: String
+      isVerified: Boolean!
     ): Token!
-
+    socialSignUp(username: String!, authType: String!, email: String!, isVerified: Boolean!): Token!
     signIn(login: String!, password: String!): Token!
     forgotPassword(email: String!, password: String!, optp: String!): Token!
-    updateUser(username: String!): User!
+    updateUser(email: String!, username: String, image: String, isLogin: Boolean): User!
+    updatePassword(email: String!, password: String!): User!
+    updateVerified(email: String!, isVerified: Boolean!): User!
     deleteUser(id: ID!): Boolean!
   }
 
@@ -30,5 +33,9 @@ export default gql`
     email: String!
     role: String
     messages: [Message!]
+    image: String
+    isVerified: Boolean!
+    isLogin: Boolean!
+    authType: String
   }
 `;
