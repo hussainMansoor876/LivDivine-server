@@ -93,7 +93,7 @@ sequelize.sync({ force: isTest || isProduction,
       },
     });
   
-console.log("asdasdsaddddddddddddddddddddd",user);
+// console.log("asdasdsaddddddddddddddddddddd",user);
   if ((isTest || isProduction) && user.length <=0) {
     createUsersWithMessages(new Date());
   }

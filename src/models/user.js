@@ -21,11 +21,6 @@ const user = (sequelize, DataTypes) => {
     },
     password: {
       type: DataTypes.STRING,
-      allowNull: false,
-      validate: {
-        notEmpty: true,
-        len: [7, 500],
-      },
     },
     role: {
       type: DataTypes.STRING,
@@ -33,7 +28,21 @@ const user = (sequelize, DataTypes) => {
     optp: {
       type: DataTypes.STRING,
     },
+    image: {
+      type: DataTypes.STRING,
+    },
+    isVerified: {
+      type: DataTypes.BOOLEAN,
+    },
+    isLogin: {
+      type: DataTypes.BOOLEAN,
+    },
+    authType: {
+      type: DataTypes.STRING,
+    },
+
   });
+
 
   User.associate = models => {
     User.hasMany(models.Message, { onDelete: 'CASCADE' });
@@ -54,15 +63,21 @@ const user = (sequelize, DataTypes) => {
   };
 
   User.beforeCreate(async user => {
-    user.password = await user.generatePasswordHash();
+    const pass = await user.generatePasswordHash();
+    if(pass){
+      user.password = pass
+    }
   });
 
-  User.prototype.generatePasswordHash = async function() {
-    const saltRounds = 10;
-    return await bcrypt.hash(this.password, saltRounds);
+  User.prototype.generatePasswordHash = async function () {
+    if (this.password) {
+      const saltRounds = 10;
+      return await bcrypt.hash(this.password, saltRounds);
+    }
+    return false
   };
 
-  User.prototype.validatePassword = async function(password) {
+  User.prototype.validatePassword = async function (password) {
     return await bcrypt.compare(password, this.password);
   };
 
