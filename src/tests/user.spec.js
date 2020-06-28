@@ -9,7 +9,7 @@ describe('users', () => {
         data: {
           user: {
             id: '1',
-            username: 'rwieruch',
+            userName: 'rwieruch',
             email: 'hello@robin.com',
             role: 'ADMIN',
           },
@@ -41,13 +41,13 @@ describe('users', () => {
           users: [
             {
               id: '1',
-              username: 'rwieruch',
+              userName: 'rwieruch',
               email: 'hello@robin.com',
               role: 'ADMIN',
             },
             {
               id: '2',
-              username: 'ddavids',
+              userName: 'ddavids',
               email: 'hello@david.com',
               role: null,
             },
@@ -79,7 +79,7 @@ describe('users', () => {
         data: {
           me: {
             id: '1',
-            username: 'rwieruch',
+            userName: 'rwieruch',
             email: 'hello@robin.com',
           },
         },
@@ -113,7 +113,7 @@ describe('users', () => {
           },
         },
       } = await userApi.signUp({
-        username: 'Mark',
+        userName: 'Mark',
         email: 'mark@gmule.com',
         password: 'asdasdasd',
       });
@@ -126,7 +126,7 @@ describe('users', () => {
 
       expect(me).to.eql({
         id: '3',
-        username: 'Mark',
+        userName: 'Mark',
         email: 'mark@gmule.com',
       });
 
@@ -136,9 +136,9 @@ describe('users', () => {
         data: {
           data: { updateUser },
         },
-      } = await userApi.updateUser({ username: 'Mark' }, token);
+      } = await userApi.updateUser({ userName: 'Mark' }, token);
 
-      expect(updateUser.username).to.eql('Mark');
+      expect(updateUser.userName).to.eql('Mark');
 
       // delete as admin
 
@@ -184,18 +184,18 @@ describe('users', () => {
     });
   });
 
-  describe('updateUser(username: String!): User!', () => {
+  describe('updateUser(userName: String!): User!', () => {
     it('returns an error because only authenticated users can update a user', async () => {
       const {
         data: { errors },
-      } = await userApi.updateUser({ username: 'Mark' });
+      } = await userApi.updateUser({ userName: 'Mark' });
 
       expect(errors[0].message).to.eql('Not authenticated as user.');
     });
   });
 
   describe('signIn(login: String!, password: String!): Token!', () => {
-    it('returns a token when a user signs in with username', async () => {
+    it('returns a token when a user signs in with userName', async () => {
       const {
         data: {
           data: {
