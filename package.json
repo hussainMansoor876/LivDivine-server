@@ -2,7 +2,7 @@
   "name": "fullstack-apollo-express-boilerplate-project",
   "version": "1.0.0",
   "description": "",
-  "main": "index.js",
+  "main": "src/index.js",
   "scripts": {
     "start": "nodemon --exec babel-node src/index.js",
     "test-server": "TEST_DATABASE=mytestdatabase npm start",
