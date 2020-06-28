@@ -23,7 +23,7 @@ export const me = async token =>
           me {
             id
             email
-            username
+            userName
           }
         }
       `,
@@ -43,7 +43,7 @@ export const user = async variables =>
       query ($id: ID!) {
         user(id: $id) {
           id
-          username
+          userName
           email
           role
         }
@@ -58,7 +58,7 @@ export const users = async () =>
       {
         users {
           id
-          username
+          userName
           email
           role
         }
@@ -70,12 +70,12 @@ export const signUp = async variables =>
   axios.post(API_URL, {
     query: `
       mutation(
-        $username: String!,
+        $userName: String!,
         $email: String!,
         $password: String!
       ) {
         signUp(
-          username: $username,
+          userName: $userName,
           email: $email,
           password: $password
         ) {
@@ -91,9 +91,9 @@ export const updateUser = async (variables, token) =>
     API_URL,
     {
       query: `
-        mutation ($username: String!) {
-          updateUser(username: $username) {
-            username
+        mutation ($userName: String!) {
+          updateUser(userName: $userName) {
+            userName
           }
         }
       `,

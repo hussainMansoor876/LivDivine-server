@@ -6,8 +6,8 @@ var nodemailer = require('nodemailer');
 import { isAdmin, isAuthenticated } from './authorization';
 
 const createToken = async (user, secret, expiresIn) => {
-  const { id, email, username, role } = user;
-  return await jwt.sign({ id, email, username, role }, secret, {
+  const { id, email, userName, role } = user;
+  return await jwt.sign({ id, email, userName, role }, secret, {
     expiresIn,
   });
 };
@@ -56,10 +56,11 @@ export default {
   Mutation: {
     signUp: async (
       parent,
-      { username, email, password, isVerified },
+      { userName, email, password, isVerified },
       { models, secret },
     ) => {
 
+      console.log('***')
       var newUser = await models.User.find({
         where: {
           email: email,
@@ -74,7 +75,7 @@ export default {
           password = await bcrypt.hash(pass, saltRounds);
 
           await user.update({
-            username,
+            userName,
             password,
             isLogin: false
           });
@@ -88,7 +89,7 @@ export default {
 
       } else {
         const user1 = await models.User.create({
-          username,
+          userName,
           email,
           password,
           isVerified,
@@ -102,7 +103,7 @@ export default {
 
     socialSignUp: async (
       parent,
-      { username, email, authType, isVerified },
+      { userName, email, authType, isVerified },
       { models, secret },
     ) => {
       var newUser = await models.User.findOne({
@@ -120,7 +121,7 @@ export default {
           // password = await bcrypt.hash(pass, saltRounds);
 
           await user.update({
-            username,
+            userName,
             isLogin: true,
             authType
             // password,
@@ -133,7 +134,7 @@ export default {
 
       } else {
         let newUser1 = await models.User.create({
-          username,
+          userName,
           email,
           isVerified,
           isLogin: true,

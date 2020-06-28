@@ -76,7 +76,7 @@ const server = new ApolloServer({
   },
 });
 
-server.applyMiddleware({ app, path: '/graphql' });
+server.applyMiddleware({ app, path: '/' });
 
 const httpServer = http.createServer(app);
 server.installSubscriptionHandlers(httpServer);
@@ -94,53 +94,53 @@ sequelize.sync({ force: isTest || isProduction,
     });
   
 // console.log("asdasdsaddddddddddddddddddddd",user);
-  if ((isTest || isProduction) && user.length <=0) {
-    createUsersWithMessages(new Date());
-  }
+  // if ((isTest || isProduction) && user.length <=0) {
+  //   createUsersWithMessages(new Date());
+  // }
 
 
 });
 httpServer.listen({ port }, () => {
   console.log(`Apollo Server on http://localhost:${port}/graphql`);
 });
-const createUsersWithMessages = async date => {
+// const createUsersWithMessages = async date => {
 
-  await models.User.create(
-    {
-      username: 'rwieruch',
-      email: 'hello@robin.com',
-      password: 'rwieruch',
-      role: 'ADMIN',
-      messages: [
-        {
-          text: 'Published the Road to learn React',
-          createdAt: date.setSeconds(date.getSeconds() + 1),
-        },
-      ],
-    },
-    {
-      include: [models.Message],
-    },
-  );
+//   await models.User.create(
+//     {
+//       userName: 'rwieruch',
+//       email: 'hello@robin.com',
+//       password: 'rwieruch',
+//       role: 'ADMIN',
+//       messages: [
+//         {
+//           text: 'Published the Road to learn React',
+//           createdAt: date.setSeconds(date.getSeconds() + 1),
+//         },
+//       ],
+//     },
+//     {
+//       include: [models.Message],
+//     },
+//   );
 
-  await models.User.create(
-    {
-      username: 'ddavids',
-      email: 'hello@david.com',
-      password: 'ddavids',
-      messages: [
-        {
-          text: 'Happy to release ...',
-          createdAt: date.setSeconds(date.getSeconds() + 1),
-        },
-        {
-          text: 'Published a complete ...',
-          createdAt: date.setSeconds(date.getSeconds() + 1),
-        },
-      ],
-    },
-    {
-      include: [models.Message],
-    },
-  );
-};
+//   await models.User.create(
+//     {
+//       userName: 'ddavids',
+//       email: 'hello@david.com',
+//       password: 'ddavids',
+//       messages: [
+//         {
+//           text: 'Happy to release ...',
+//           createdAt: date.setSeconds(date.getSeconds() + 1),
+//         },
+//         {
+//           text: 'Published a complete ...',
+//           createdAt: date.setSeconds(date.getSeconds() + 1),
+//         },
+//       ],
+//     },
+//     {
+//       include: [models.Message],
+//     },
+//   );
+// };
