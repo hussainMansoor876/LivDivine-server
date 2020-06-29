@@ -48,7 +48,7 @@ export default {
 
   Mutation: {
     createMessage: combineResolvers(
-      isAuthenticated,
+      // isAuthenticated,
       async (parent, { text }, { models, me }) => {
         const message = await models.Message.create({
           text,

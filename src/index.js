@@ -76,7 +76,7 @@ const server = new ApolloServer({
   },
 });
 
-server.applyMiddleware({ app, path: '/graphql' });
+server.applyMiddleware({ app, path: '/' });
 
 const httpServer = http.createServer(app);
 server.installSubscriptionHandlers(httpServer);
@@ -86,15 +86,16 @@ const isProduction = !!process.env.DATABASE_URL;
 const port = process.env.PORT || 8000;
 
 sequelize.sync({ force: isTest || isProduction,
-  sync: true }).then(async () => {
-    const user = await models.User.findAll({
-      where: {
-        email: "hello@robin.com",
-      },
-    });
-  
+  sync: true
+}).then(async () => {
+  const user = await models.User.findAll({
+    where: {
+      email: "hello@robin.com",
+    },
+  });
+
 // console.log("asdasdsaddddddddddddddddddddd",user);
-  if ((isTest || isProduction) && user.length <=0) {
+  if ((isTest || isProduction) && user.length <= 0) {
     createUsersWithMessages(new Date());
   }
 
@@ -107,7 +108,7 @@ const createUsersWithMessages = async date => {
 
   await models.User.create(
     {
-      username: 'rwieruch',
+      userName: 'rwieruch',
       email: 'hello@robin.com',
       password: 'rwieruch',
       role: 'ADMIN',
@@ -125,7 +126,7 @@ const createUsersWithMessages = async date => {
 
   await models.User.create(
     {
-      username: 'ddavids',
+      userName: 'ddavids',
       email: 'hello@david.com',
       password: 'ddavids',
       messages: [
