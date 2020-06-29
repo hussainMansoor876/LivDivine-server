@@ -144,4 +144,5 @@ const createUsersWithMessages = async date => {
       include: [models.Message],
     },
   );
+  console.log('asdasdasd')
 };

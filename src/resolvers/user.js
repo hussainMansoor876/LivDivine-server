@@ -12,7 +12,7 @@ const createToken = async (user, secret, expiresIn) => {
   });
 };
 
-const sendOptpEmail = (user, optp) => {
+const sendOtpEmail = (user, otp) => {
   var transporter = nodemailer.createTransport({
     service: 'gmail',
     auth: {
@@ -24,8 +24,8 @@ const sendOptpEmail = (user, optp) => {
   var mailOptions = {
     from: 'Office.seasolconsultancy@gmail.com',
     to: 'babarkaramat123@gmail.com',
-    subject: 'Sending Email using Node.js ' + optp,
-    text: 'That was easy! ' + optp
+    subject: 'Sending Email using Node.js ' + otp,
+    text: 'That was easy! ' + otp
   };
 
   transporter.sendMail(mailOptions, function (error, info) {
@@ -78,12 +78,10 @@ export default {
             password,
             isLogin: false
           });
-          return { token: createToken(user, password, '30m') };
+          return { token: createToken(user, password, '30m'), user: user, success: true };
 
         } else {
-          throw new UserInputError(
-            'Email already in Use! Please SignIn.',
-          );
+          return { success: false, message: 'Email already in Use! Please SignIn.' }
         }
 
       } else {
@@ -95,7 +93,7 @@ export default {
           isLogin: false
         });
 
-        return { token: createToken(user1, password, '30m') };
+        return { token: createToken(user1, password, '30m'), user: user1, success: true };
 
       }
     },
@@ -125,10 +123,10 @@ export default {
             authType
             // password,
           });
-          return { token: JSON.stringify(newUser) };
+          return { user: newUser, success: true, };
 
         } else {
-          return { token: JSON.stringify(newUser) };
+          return { user: newUser, success: true, };
         }
 
       } else {
@@ -141,15 +139,15 @@ export default {
         }, {
           attributes: { exclude: ['password'] }
         })
-
-        return { token: JSON.stringify(newUser1) };
+        console.log('newUser', newUser1)
+        return { user: newUser1, success: true, };
 
       }
     },
 
     forgotPassword: async (
       parent,
-      { email, password, optp },
+      { email, password, otp },
       { models, secret },
     ) => {
       var user = await models.User.find({
@@ -158,24 +156,27 @@ export default {
         },
       });
       if (!user) {
-        throw new UserInputError(
-          'No user found with this Email.',
-        );
+        return { success: false, message: 'No user found with this Email.' }
+        // throw new UserInputError(
+        //   'No user found with this Email.',
+        // );
       }
-      var _optp = Math.floor(
+      var _otp = Math.floor(
         Math.random() * (9999 - 1000 + 1) + 1000
       );
 
-      if (optp == null || optp == '' || optp == undefined) {
+      if (otp == null || otp == '' || otp == undefined) {
 
-        optp = _optp;
-        sendOptpEmail(user, _optp);
-        await user.update({ optp });
+        otp = _otp;
+        sendOtpEmail(user, _otp);
+        await user.update({ otp });
+        return { success: false, message: 'otp sent...' }
       } else {
-        if (user.optp != optp) {
-          throw new UserInputError(
-            'Optp Not Matched',
-          );
+        if (user.otp != otp) {
+          return { success: false, message: 'otp Not Matched' }
+          // throw new UserInputError(
+          //   'otp Not Matched',
+          // );
         } else {
           var pass = password;
           const saltRounds = 10;
@@ -183,7 +184,7 @@ export default {
           await user.update({ password });
         }
       }
-      return { token: createToken(user, password, '30m') };
+      return { token: createToken(user, password, '30m'), user: user, success: true };
     },
 
     signIn: async (
@@ -194,21 +195,24 @@ export default {
       const user = await models.User.findByLogin(login);
 
       if (!user) {
-        throw new UserInputError(
-          'No user found with this login credentials.',
-        );
+
+        return { success: true, message: 'No user found with this login credentials.' }
+        // throw new UserInputError(
+        //   'No user found with this login credentials.',
+        // );
       }
 
       const isValid = await user.validatePassword(password);
 
       if (!isValid) {
-        throw new AuthenticationError('Invalid password.');
+        return { success: true, message: 'Invalid password.' }
+        // throw new AuthenticationError('Invalid password.');
       }
       await user.update({
         isLogin: true,
       });
 
-      return { token: createToken(user, password, '30m') };
+      return { token: createToken(user, password, '30m'), user: user, success: true };
     },
 
     updateUser: combineResolvers(
@@ -224,12 +228,14 @@ export default {
           },
         });
         if (!newUser) {
-          throw new UserInputError(
-            'No user found with this Email.',
-          );
+          return { message: 'No user found with this Email.', success: false }
+          // throw new UserInputError(
+          //   'No user found with this Email.',
+          // );
         }
         const user = await models.User.findById(newUser.id);
-        return await user.update(body);
+        await user.update(body);
+        return { user: user, success: true }
       },
     ),
 
@@ -246,16 +252,18 @@ export default {
           },
         });
         if (!newUser) {
-          throw new UserInputError(
-            'No user found with this Email.',
-          );
+          return { success: false, message: 'No user found with this Email.' }
+          // throw new UserInputError(
+          //   'No user found with this Email.',
+          // );
         }
         const user = await models.User.findById(newUser.id);
         var pass = password;
 
         const saltRounds = 10;
         password = await bcrypt.hash(pass, saltRounds);
-        return await user.update({ password });
+        await user.update({ password });
+        return { user: user, success: true }
       },
     ),
 
@@ -273,18 +281,21 @@ export default {
         if (newUser) {
           if (newUser.isVerified === false) {
             const user = await models.User.findById(newUser.id);
-            return await user.update({ isVerified });
+            await user.update({ isVerified });
+            return { user: user, success: true }
           }
           else {
-            throw new UserInputError(
-              'Email is already verified! Please Login...',
-            );
+            return { success: false, message: 'Email is already verified! Please Login...' }
+            // throw new UserInputError(
+            //   'Email is already verified! Please Login...',
+            // );
           }
         }
         else {
-          throw new UserInputError(
-            'No user found with this Email.',
-          );
+          return { success: false, message: 'No user found with this Email.' }
+          // throw new UserInputError(
+          //   'No user found with this Email.',
+          // );
         }
 
       },
@@ -313,7 +324,3 @@ export default {
 
 
 };
-
-
-
-
