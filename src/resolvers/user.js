@@ -60,7 +60,6 @@ export default {
       { models, secret },
     ) => {
 
-      console.log('***')
       var newUser = await models.User.find({
         where: {
           email: email,
