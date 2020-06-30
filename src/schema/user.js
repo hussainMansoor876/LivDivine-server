@@ -13,6 +13,7 @@ export default gql`
       email: String!
       password: String
       isVerified: Boolean!
+      categories: String
     ): Token!
     socialSignUp(userName: String!, authType: String!, email: String!, isVerified: Boolean!): Token!
     signIn(login: String!, password: String!): Token!
@@ -29,6 +30,12 @@ export default gql`
     message: String
     success: Boolean!
   }
+  type Messages {
+    messages: String!
+  }
+  type Categories {
+    categories: String!
+  }
 
   type User {
     id: ID!
@@ -44,5 +51,6 @@ export default gql`
     advisorImage: String
     aboutService: String
     aboutMe: String
+    categories: String
   }
 `;

@@ -85,7 +85,8 @@ const isTest = !!process.env.TEST_DATABASE;
 const isProduction = !!process.env.DATABASE_URL;
 const port = process.env.PORT || 8000;
 
-sequelize.sync({ force: isTest || isProduction,
+sequelize.sync({
+  force: isTest || isProduction,
   sync: true
 }).then(async () => {
   const user = await models.User.findAll({
@@ -94,7 +95,7 @@ sequelize.sync({ force: isTest || isProduction,
     },
   });
 
-// console.log("asdasdsaddddddddddddddddddddd",user);
+  // console.log("asdasdsaddddddddddddddddddddd",user);
   if ((isTest || isProduction) && user.length <= 0) {
     createUsersWithMessages(new Date());
   }
@@ -112,6 +113,8 @@ const createUsersWithMessages = async date => {
       email: 'hello@robin.com',
       password: 'rwieruch',
       role: 'ADMIN',
+      isVerified: true,
+      isLogin: false,
       messages: [
         {
           text: 'Published the Road to learn React',
@@ -129,6 +132,8 @@ const createUsersWithMessages = async date => {
       userName: 'ddavids',
       email: 'hello@david.com',
       password: 'ddavids',
+      isVerified: true,
+      isLogin: false,
       messages: [
         {
           text: 'Happy to release ...',

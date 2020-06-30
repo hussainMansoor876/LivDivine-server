@@ -56,7 +56,7 @@ export default {
   Mutation: {
     signUp: async (
       parent,
-      { userName, email, password, isVerified },
+      { userName, email, password, isVerified, categories },
       { models, secret },
     ) => {
 
@@ -76,7 +76,8 @@ export default {
           await user.update({
             userName,
             password,
-            isLogin: false
+            isLogin: false,
+            categories: categories
           });
           return { token: createToken(user, password, '30m'), user: user, success: true };
 
@@ -90,9 +91,9 @@ export default {
           email,
           password,
           isVerified,
-          isLogin: false
+          isLogin: false,
+          categories: categories
         });
-
         return { token: createToken(user1, password, '30m'), user: user1, success: true };
 
       }
@@ -192,7 +193,12 @@ export default {
       { login, password, isLogin },
       { models, secret },
     ) => {
-      const user = await models.User.findByLogin(login);
+      var user = await models.User.find({
+        where: {
+          email: login, isVerified: true
+        },
+      });
+      // const user = await models.User.findByLogin(login);
 
       if (!user) {
 

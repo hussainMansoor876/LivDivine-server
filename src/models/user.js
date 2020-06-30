@@ -63,6 +63,9 @@ const user = (sequelize, DataTypes) => {
         len: [50, 200],
       }
     },
+    categories: {      
+      type: DataTypes.STRING,
+    }
   });
 
 
