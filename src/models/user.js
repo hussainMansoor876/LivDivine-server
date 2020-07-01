@@ -18,14 +18,19 @@ const user = (sequelize, DataTypes) => {
     email: {
       type: DataTypes.STRING,
       unique: true,
-      allowNull: false,
-      validate: {
-        notEmpty: true,
-        isEmail: true,
-      },
+      allowNull: true,
+      // validate: {
+      //   notEmpty: true,
+      //   isEmail: true,
+      // },
     },
     password: {
       type: DataTypes.STRING,
+    },
+    socialAuthId: {      
+      type: DataTypes.STRING,
+      unique: true,
+      allowNull: true,
     },
     role: {
       type: DataTypes.STRING,

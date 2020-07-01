@@ -15,7 +15,7 @@ export default gql`
       isVerified: Boolean!
       categories: String
     ): Token!
-    socialSignUp(userName: String!, authType: String!, email: String!, isVerified: Boolean!): Token!
+    socialSignUp(userName: String!, email: String, authType: String!, socialAuthId: String!, image: String ): Token!
     signIn(login: String!, password: String!): Token!
     forgotPassword(email: String!, password: String!, otp: String!): Token!
     updateUser(email: String!, userName: String, image: String, isLogin: Boolean): Token!
@@ -40,7 +40,8 @@ export default gql`
   type User {
     id: ID!
     userName: String!
-    email: String!
+    email: String
+    socialAuthId: String
     role: String
     messages: [Message!]
     image: String
