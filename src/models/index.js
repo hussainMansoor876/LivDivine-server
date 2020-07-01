@@ -12,15 +12,15 @@ if (process.env.DATABASE_URL) {
     process.env.DATABASE_PASSWORD,
     {
       dialect: 'postgres',
-      port:5432
+      port: 5000
     },
   );
 }
 
-
 const models = {
   User: sequelize.import('./user'),
   Message: sequelize.import('./message'),
+  Review: sequelize.import('./review'),
 };
 
 Object.keys(models).forEach(key => {

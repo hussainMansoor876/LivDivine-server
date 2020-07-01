@@ -2,8 +2,14 @@ import bcrypt from 'bcryptjs';
 
 const user = (sequelize, DataTypes) => {
   const User = sequelize.define('user', {
+    id: {
+      type: DataTypes.UUID,
+      defaultValue: DataTypes.UUIDV4,
+      primaryKey: true,
+    },
     userName: {
       type: DataTypes.STRING,
+      // unique: true,
       allowNull: false,
       validate: {
         notEmpty: true,
@@ -24,7 +30,7 @@ const user = (sequelize, DataTypes) => {
     role: {
       type: DataTypes.STRING,
     },
-    optp: {
+    otp: {
       type: DataTypes.STRING,
     },
     image: {
@@ -39,12 +45,33 @@ const user = (sequelize, DataTypes) => {
     authType: {
       type: DataTypes.STRING,
     },
-
+    title: {
+      type: DataTypes.STRING,
+    },
+    advisorImage: {
+      type: DataTypes.STRING,
+    },
+    aboutService: {
+      type: DataTypes.STRING,
+      validate: {
+        len: [100, 200],
+      }
+    },
+    aboutMe: {
+      type: DataTypes.STRING,
+      validate: {
+        len: [50, 200],
+      }
+    },
+    categories: {      
+      type: DataTypes.STRING,
+    }
   });
 
 
   User.associate = models => {
     User.hasMany(models.Message, { onDelete: 'CASCADE' });
+    // User.hasMany(models.Review, { onDelete: 'CASCADE' });
   };
 
   User.findByLogin = async login => {
@@ -63,7 +90,7 @@ const user = (sequelize, DataTypes) => {
 
   User.beforeCreate(async user => {
     const pass = await user.generatePasswordHash();
-    if(pass){
+    if (pass) {
       user.password = pass
     }
   });
