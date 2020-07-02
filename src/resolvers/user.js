@@ -4,6 +4,7 @@ import bcrypt from 'bcryptjs';
 import { AuthenticationError, UserInputError } from 'apollo-server';
 var nodemailer = require('nodemailer');
 import { isAdmin, isAuthenticated } from './authorization';
+import { condition } from 'sequelize';
 
 const createToken = async (user, secret, expiresIn) => {
   const { id, email, userName, role } = user;
@@ -101,48 +102,76 @@ export default {
 
     socialSignUp: async (
       parent,
-      { userName, email, authType, isVerified },
+      body,
       { models, secret },
     ) => {
-      var newUser = await models.User.findOne({
-        where: {
-          email: email,
-        },
-        attributes: { exclude: ['password'] }
-      });
-      if (newUser) {
-        if (newUser.isVerified === false) {
-          const user = await models.User.findById(newUser.id);
-          // var pass = password;
-
-          // const saltRounds = 10;
-          // password = await bcrypt.hash(pass, saltRounds);
-
-          await user.update({
+      const { userName, email, socialAuthId, image, authType } = body
+      if (email) {
+        var newUser = await models.User.findOne({
+          where: {
+            $or: [
+              { email: email },
+              { socialAuthId: socialAuthId },
+            ]
+          },
+          attributes: { exclude: ['password'] }
+        });
+        if (newUser) {
+          await newUser.update({
             userName,
             isLogin: true,
-            authType
-            // password,
+            isVerified: true,
+            socialAuthId,
           });
           return { user: newUser, success: true, };
 
         } else {
-          return { user: newUser, success: true, };
+          let newUser1 = await models.User.create({
+            userName,
+            socialAuthId,
+            isVerified: true,
+            isLogin: true,
+            authType,
+            image,
+            email
+          }, {
+            attributes: { exclude: ['password'] }
+          })
+          return { user: newUser1, success: true, };
+
         }
-
-      } else {
-        let newUser1 = await models.User.create({
-          userName,
-          email,
-          isVerified,
-          isLogin: true,
-          authType
-        }, {
+      }
+      else {
+        var newUser = await models.User.findOne({
+          where: {
+            socialAuthId: socialAuthId
+          },
           attributes: { exclude: ['password'] }
-        })
-        console.log('newUser', newUser1)
-        return { user: newUser1, success: true, };
+        });
+        if (newUser) {
+          await newUser.update({
+            userName,
+            isLogin: true,
+            isVerified: true,
+            socialAuthId,
+            image,
+            authType,
+          });
+          return { user: newUser, success: true, };
 
+        } else {
+          let newUser1 = await models.User.create({
+            userName,
+            socialAuthId,
+            isVerified: true,
+            isLogin: true,
+            authType
+          }, {
+            attributes: { exclude: ['password'] }
+          })
+          return { user: newUser1, success: true, };
+
+        }
       }
     },
 
