@@ -54,9 +54,6 @@ const user = (sequelize, DataTypes) => {
     title: {
       type: STRING,
     },
-    advisorImage: {
-      type: STRING,
-    },
     aboutService: {
       type: STRING,
       validate: {

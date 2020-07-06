@@ -22,7 +22,7 @@ export default gql`
     updateUser(email: String!, userName: String, image: String, isLogin: Boolean, isOnline: Boolean): Token!
     updatePassword(email: String!, password: String!): Token!
     updateVerified(email: String!, isVerified: Boolean!): Token!    
-    becomeAdvisor(email: String,authId: String, userName: String, title: String, advisorImage: String, 
+    becomeAdvisor(email: String,authId: String, userName: String, title: String, image: String, 
       role: String, aboutService: String, aboutMe: String,categories: String isLogin: Boolean): Token!
     deleteUser(id: ID!): Boolean!
   }
@@ -58,7 +58,7 @@ export default gql`
     isOnline: Boolean
     authType: String
     title: String
-    advisorImage: String
+    aimage: String
     aboutService: String
     aboutMe: String
     categories: String
