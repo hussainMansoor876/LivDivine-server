@@ -41,7 +41,7 @@ export default {
         // },
       };
     },
-    reviews: async (parent, { id }, { models }) => {
+    review: async (parent, { id }, { models }) => {
       return await models.Reviews.findById(id);
     },
     getReviewByAdvisorId: combineResolvers(

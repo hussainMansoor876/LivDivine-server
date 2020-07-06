@@ -1,12 +1,13 @@
 const message = (sequelize, DataTypes) => {
+  const {UUIDV4, STRING, UUID} = DataTypes
   const Message = sequelize.define('message', {
     id: {
-      type: DataTypes.UUID,
-      defaultValue: DataTypes.UUIDV4,
+      type: UUID,
+      defaultValue: UUIDV4,
       primaryKey: true,
     },
     text: {
-      type: DataTypes.STRING,
+      type: STRING,
       validate: { notEmpty: true },
     },
   });

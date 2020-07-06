@@ -22,6 +22,8 @@ const models = {
   Message: sequelize.import('./message'),
   Review: sequelize.import('./review'),
   Favourite: sequelize.import('./favourite'),
+  Category: sequelize.import('./category'),
+  UserCategory: sequelize.import('./userCategory'),
 };
 
 Object.keys(models).forEach(key => {

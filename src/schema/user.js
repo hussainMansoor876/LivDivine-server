@@ -16,13 +16,13 @@ export default gql`
       isVerified: Boolean!
       categories: String
     ): Token!
-    socialSignUp(userName: String!, email: String, authType: String!, socialAuthId: String!, image: String ): Token!
+    socialSignUp(userName: String!, email: String, authType: String!, authId: String!, image: String ): Token!
     signIn(login: String!, password: String!): Token!
     forgotPassword(email: String!, password: String!, otp: String!): Token!
     updateUser(email: String!, userName: String, image: String, isLogin: Boolean, isOnline: Boolean): Token!
     updatePassword(email: String!, password: String!): Token!
     updateVerified(email: String!, isVerified: Boolean!): Token!    
-    becomeAdvisor(email: String,socialAuthId: String, userName: String, title: String, advisorImage: String, 
+    becomeAdvisor(email: String,authId: String, userName: String, title: String, advisorImage: String, 
       role: String, aboutService: String, aboutMe: String,categories: String isLogin: Boolean): Token!
     deleteUser(id: ID!): Boolean!
   }
@@ -49,7 +49,7 @@ export default gql`
     id: ID!
     userName: String!
     email: String
-    socialAuthId: String
+    authId: String
     role: String
     messages: [Message!]
     image: String

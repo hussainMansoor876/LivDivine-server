@@ -122,13 +122,13 @@ export default {
       body,
       { models, secret },
     ) => {
-      const { userName, email, socialAuthId, image, authType } = body
+      const { userName, email, authId, image, authType } = body
       if (email) {
         var newUser = await models.User.findOne({
           where: {
             $or: [
               { email: email },
-              { socialAuthId: socialAuthId },
+              { authId: authId },
             ]
           },
           attributes: { exclude: ['password'] }
@@ -139,14 +139,14 @@ export default {
             isLogin: true,
             isOnline: true,
             isVerified: true,
-            socialAuthId,
+            authId,
           });
           return { user: newUser, success: true, };
 
         } else {
           let newUser1 = await models.User.create({
             userName,
-            socialAuthId,
+            authId,
             isVerified: true,
             isLogin: true,
             isOnline: true,
@@ -164,7 +164,7 @@ export default {
       else {
         var newUser = await models.User.findOne({
           where: {
-            socialAuthId: socialAuthId
+            authId: authId
           },
           attributes: { exclude: ['password'] }
         });
@@ -173,7 +173,7 @@ export default {
             userName,
             isLogin: true,
             isVerified: true,
-            socialAuthId,
+            authId,
             image,
             authType,
           });
@@ -182,7 +182,7 @@ export default {
         } else {
           let newUser1 = await models.User.create({
             userName,
-            socialAuthId,
+            authId,
             isVerified: true,
             isLogin: true,
             authType,
@@ -252,7 +252,7 @@ export default {
 
       if (!user) {
 
-        return { success: true, message: 'No user found with this login credentials.' }
+        return { success: false, message: 'No user found with this login credentials.' }
         // throw new UserInputError(
         //   'No user found with this login credentials.',
         // );
@@ -261,7 +261,7 @@ export default {
       const isValid = await user.validatePassword(password);
 
       if (!isValid) {
-        return { success: true, message: 'Invalid password.' }
+        return { success: false, message: 'Invalid password.' }
         // throw new AuthenticationError('Invalid password.');
       }
       await user.update({
@@ -365,12 +365,12 @@ export default {
         parent,
         body,
         { models, me }) => {
-        const { email, socialAuthId, title, userName, advisorImage, role, aboutService, aboutMe, categories, isLogin } = body
+        const { email, authId, title, userName, advisorImage, role, aboutService, aboutMe, categories, isLogin } = body
         var newUser = await models.User.find({
           where: {
             $or: [
               { email: email },
-              { socialAuthId: socialAuthId },
+              { authId: authId },
             ],
             // email: body.email,
             isVerified: true

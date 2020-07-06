@@ -1,27 +1,28 @@
 const favourite = (sequelize, DataTypes) => {
+  const {UUIDV4, STRING, UUID} = DataTypes
   const Favourite = sequelize.define('favourite', {
     id: {
-      type: DataTypes.UUID,
-      defaultValue: DataTypes.UUIDV4,
+      type: UUID,
+      defaultValue: UUIDV4,
       primaryKey: true,
     },
 
     advisorName: {
-      type: DataTypes.STRING,
+      type: STRING,
       allowNull: false,
       validate: {
         notEmpty: true,
       },
     },
     advisorId: {
-      type: DataTypes.UUID,
+      type: UUID,
       allowNull: false,
       validate: {
         notEmpty: true,
       },
     },
     userName: {
-      type: DataTypes.STRING,
+      type: STRING,
       // unique: true,
       allowNull: false,
       validate: {
