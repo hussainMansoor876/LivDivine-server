@@ -133,7 +133,8 @@ const createUsersWithMessages = async date => {
       email: 'hello@david.com',
       password: 'ddavids',
       isVerified: true,
-      isLogin: false,
+      isLogin: false,      
+      role: "USER",
       messages: [
         {
           text: 'Happy to release ...',

@@ -3,11 +3,12 @@ import { gql } from 'apollo-server-express';
 export default gql`
   extend type Query {
     messages(cursor: String, limit: Int): MessageConnection!
+    getMessageById(userId: ID!): MessageResult!
     message(id: ID!): Message!
   }
 
   extend type Mutation {
-    createMessage(text: String!): Message!
+    createMessage(userId: ID!, text: String!): Message!
     deleteMessage(id: ID!): Boolean!
   }
 
@@ -20,12 +21,17 @@ export default gql`
     hasNextPage: Boolean!
     endCursor: String!
   }
+  type MessageResult {
+    result: [Message]
+    message: String
+    success: Boolean
+  }
 
   type Message {
     id: ID!
     text: String!
     createdAt: Date!
-    user: User!
+    user: User!    
   }
 
   extend type Subscription {

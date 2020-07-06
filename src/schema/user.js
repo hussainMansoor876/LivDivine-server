@@ -3,7 +3,8 @@ import { gql } from 'apollo-server-express';
 export default gql`
   extend type Query {
     users: [User!]
-    user(id: ID!): User
+    user(id: ID!): User    
+    getAllUserByRole(role: String!): RoleUser!
     me: User
   }
 
@@ -18,15 +19,22 @@ export default gql`
     socialSignUp(userName: String!, email: String, authType: String!, socialAuthId: String!, image: String ): Token!
     signIn(login: String!, password: String!): Token!
     forgotPassword(email: String!, password: String!, otp: String!): Token!
-    updateUser(email: String!, userName: String, image: String, isLogin: Boolean): Token!
+    updateUser(email: String!, userName: String, image: String, isLogin: Boolean, isOnline: Boolean): Token!
     updatePassword(email: String!, password: String!): Token!
-    updateVerified(email: String!, isVerified: Boolean!): Token!
+    updateVerified(email: String!, isVerified: Boolean!): Token!    
+    becomeAdvisor(email: String,socialAuthId: String, userName: String, title: String, advisorImage: String, 
+      role: String, aboutService: String, aboutMe: String,categories: String isLogin: Boolean): Token!
     deleteUser(id: ID!): Boolean!
   }
 
   type Token {
     token: String
     user: User
+    message: String
+    success: Boolean!
+  }
+  type RoleUser {
+    user: [User]
     message: String
     success: Boolean!
   }
@@ -47,6 +55,7 @@ export default gql`
     image: String
     isVerified: Boolean!
     isLogin: Boolean!
+    isOnline: Boolean
     authType: String
     title: String
     advisorImage: String

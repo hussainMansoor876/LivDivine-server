@@ -3,6 +3,7 @@ import { combineResolvers } from 'graphql-resolvers';
 
 import pubsub, { EVENTS } from '../subscription';
 import { isAuthenticated, isMessageOwner } from './authorization';
+import user from '../models/user';
 
 const toCursorHash = string => Buffer.from(string).toString('base64');
 
@@ -14,12 +15,12 @@ export default {
     messages: async (parent, { cursor, limit = 100 }, { models }) => {
       const cursorOptions = cursor
         ? {
-            where: {
-              createdAt: {
-                [Sequelize.Op.lt]: fromCursorHash(cursor),
-              },
+          where: {
+            createdAt: {
+              [Sequelize.Op.lt]: fromCursorHash(cursor),
             },
-          }
+          },
+        }
         : {};
 
       const messages = await models.Message.findAll({
@@ -44,15 +45,36 @@ export default {
     message: async (parent, { id }, { models }) => {
       return await models.Message.findById(id);
     },
+    getMessageById: combineResolvers(
+      // isAuthenticated,
+      // isMessageOwner,
+      async (parent, { userId }, { models }) => {
+        console.log('user', userId)
+        var userMessage = await models.Message.findAll({
+          where: {
+            userId: userId
+          },
+        });
+
+        if (userMessage != "") {
+          console.log('userMessage', userMessage)
+          return {result : userMessage, success : true}
+        } else {
+          console.log('No message for User')
+          return { message : 'No message for User', success: false }
+        }
+      },
+    ),
   },
 
   Mutation: {
     createMessage: combineResolvers(
       // isAuthenticated,
-      async (parent, { text }, { models, me }) => {
+      async (parent, { text, userId }, { models, me }) => {
+
         const message = await models.Message.create({
           text,
-          userId: me.id,
+          userId
         });
 
         pubsub.publish(EVENTS.MESSAGE.CREATED, {

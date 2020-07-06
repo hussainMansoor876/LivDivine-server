@@ -29,14 +29,14 @@ const review = (sequelize, DataTypes) => {
         notEmpty: true,
       },
     },
-    // advisorId: {
-    //   type: DataTypes.UUIDV4,
-    //   // unique: true,
-    //   allowNull: false,
-    //   validate: {
-    //     notEmpty: true,
-    //   },
-    // },
+    advisorId: {
+      type: DataTypes.UUID,
+      // unique: true,
+      allowNull: false,
+      validate: {
+        notEmpty: true,
+      },
+    },
     reviewType: {
       type: DataTypes.BOOLEAN
     },

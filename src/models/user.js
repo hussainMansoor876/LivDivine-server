@@ -59,14 +59,17 @@ const user = (sequelize, DataTypes) => {
     aboutService: {
       type: DataTypes.STRING,
       validate: {
-        len: [100, 200],
+        len: [10, 200],
       }
     },
     aboutMe: {
       type: DataTypes.STRING,
       validate: {
-        len: [50, 200],
+        len: [10, 200],
       }
+    },
+    isOnline: {      
+      type: DataTypes.BOOLEAN,
     },
     categories: {      
       type: DataTypes.STRING,
@@ -76,7 +79,7 @@ const user = (sequelize, DataTypes) => {
 
   User.associate = models => {
     User.hasMany(models.Message, { onDelete: 'CASCADE' });
-    // User.hasMany(models.Review, { onDelete: 'CASCADE' });
+    User.hasMany(models.Favourite, { onDelete: 'CASCADE' });
   };
 
   User.findByLogin = async login => {

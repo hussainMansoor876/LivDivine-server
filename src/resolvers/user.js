@@ -45,6 +45,20 @@ export default {
     user: async (parent, { id }, { models }) => {
       return await models.User.findById(id);
     },
+    getAllUserByRole: async (parent, { role }, { models }) => {
+      var user = await models.User.findAll({
+        where: {
+          role: role
+        }
+      });
+      if (user) {
+        console.log('users', user);
+        return { user: user, success: true }
+      } else {
+        console.log('No User Found')
+        return { message: 'No User Found', success: false }
+      }
+    },
     me: async (parent, args, { models, me }) => {
       if (!me) {
         return null;
@@ -78,6 +92,7 @@ export default {
             userName,
             password,
             isLogin: false,
+            isOnline: false,
             categories: categories
           });
           return { token: createToken(user, password, '30m'), user: user, success: true };
@@ -93,7 +108,9 @@ export default {
           password,
           isVerified,
           isLogin: false,
-          categories: categories
+          isOnline: false,
+          categories: categories,
+          role: "USER"
         });
         return { token: createToken(user1, password, '30m'), user: user1, success: true };
 
@@ -120,6 +137,7 @@ export default {
           await newUser.update({
             userName,
             isLogin: true,
+            isOnline: true,
             isVerified: true,
             socialAuthId,
           });
@@ -131,9 +149,11 @@ export default {
             socialAuthId,
             isVerified: true,
             isLogin: true,
+            isOnline: true,
             authType,
             image,
-            email
+            email,
+            role: "USER"
           }, {
             attributes: { exclude: ['password'] }
           })
@@ -165,7 +185,8 @@ export default {
             socialAuthId,
             isVerified: true,
             isLogin: true,
-            authType
+            authType,
+            role: "USER"
           }, {
             attributes: { exclude: ['password'] }
           })
@@ -245,6 +266,7 @@ export default {
       }
       await user.update({
         isLogin: true,
+        isOnline: true,
       });
 
       return { token: createToken(user, password, '30m'), user: user, success: true };
@@ -336,6 +358,37 @@ export default {
       },
     ),
 
+
+    becomeAdvisor: combineResolvers(
+      // isAuthenticated,
+      async (
+        parent,
+        body,
+        { models, me }) => {
+        const { email, socialAuthId, title, userName, advisorImage, role, aboutService, aboutMe, categories, isLogin } = body
+        var newUser = await models.User.find({
+          where: {
+            $or: [
+              { email: email },
+              { socialAuthId: socialAuthId },
+            ],
+            // email: body.email,
+            isVerified: true
+          },
+        });
+        if (!newUser) {
+          console.log("No User Found")
+          return { message: 'No user found.', success: false }
+          // throw new UserInputError(
+          //   'No user found with this Email.',
+          // );
+        }
+        console.log("else")
+        const user = await models.User.findById(newUser.id);
+        await user.update(body);
+        return { user: user, success: true }
+      },
+    ),
 
     deleteUser: combineResolvers(
       isAdmin,
