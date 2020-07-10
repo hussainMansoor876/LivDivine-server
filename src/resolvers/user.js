@@ -5,6 +5,11 @@ import { AuthenticationError, UserInputError } from 'apollo-server';
 var nodemailer = require('nodemailer');
 import { isAdmin, isAuthenticated } from './authorization';
 import { condition } from 'sequelize';
+const { Op } = require("sequelize");
+import _ from 'lodash';
+
+
+const EMAIL_SECRET = 'asdf1093KMnzxcvnkljvasdu09123nlasdasdf';
 
 const createToken = async (user, secret, expiresIn) => {
   const { id, email, userName, role } = user;
@@ -14,6 +19,7 @@ const createToken = async (user, secret, expiresIn) => {
 };
 
 const sendOtpEmail = (user, otp) => {
+
   var transporter = nodemailer.createTransport({
     service: 'gmail',
     auth: {
@@ -28,7 +34,7 @@ const sendOtpEmail = (user, otp) => {
     subject: 'Sending Email using Node.js ' + otp,
     text: 'That was easy! ' + otp
   };
-
+  console.log('otp', user.email)
   transporter.sendMail(mailOptions, function (error, info) {
     if (error) {
       console.log(error);
@@ -37,10 +43,81 @@ const sendOtpEmail = (user, otp) => {
     }
   });
 }
+
+const sendVerificationEmail = (user) => {
+
+  jwt.sign(
+    {
+      user: _.pick(user, 'id'),
+    },
+    EMAIL_SECRET,
+    {
+      expiresIn: '1d',
+    },
+    (err, emailToken) => {
+      // console.log('emailToken', emailToken)
+      const url = `http://localhost:8000/confirmation/${emailToken}`;
+
+      var transporter = nodemailer.createTransport({
+        service: 'gmail',
+        auth: {
+          user: 'Office.seasolconsultancy@gmail.com',
+          pass: 'seasol12346'
+        }
+      });
+
+      var mailOptions = {
+        from: 'Office.seasolconsultancy@gmail.com',
+        to: 'waqasdemo222@gmail.com',
+        subject: 'Confirm Email',
+        html: `Please click this email to confirm your email: <a href="${url}">${url}</a>`,
+      };
+      transporter.sendMail(mailOptions, function (error, info) {
+        if (error) {
+          console.log(error);
+        } else {
+          console.log('Email sent: ' + info.response);
+        }
+      });
+    },
+  );
+
+
+
+
+  // console.log('otp', user.email)
+  // transporter.sendMail(mailOptions, function (error, info) {
+  //   if (error) {
+  //     console.log(error);
+  //   } else {
+  //     console.log('Email sent: ' + info.response);
+  //   }
+  // });
+}
+
 export default {
   Query: {
     users: async (parent, args, { models }) => {
       return await models.User.findAll();
+    },
+    searchUsers: async (parent, { userName }, { models }) => {
+      console.log('userName', userName)
+      let searchFor = userName
+      const user = models.User.findAll({
+        where: {
+          userName: {
+            [Op.iRegexp]: userName
+          }
+        },
+      })
+      if (user != "") {
+        console.log('user', user.userName)
+        return { user: user, success: true };
+
+      } else {
+        console.log('No User')
+        return { message: 'No User', success: false }
+      }
     },
     user: async (parent, { id }, { models }) => {
       return await models.User.findById(id);
@@ -95,6 +172,7 @@ export default {
             isOnline: false,
             categories: categories
           });
+          sendVerificationEmail(user);
           return { token: createToken(user, password, '30m'), user: user, success: true };
 
         } else {
@@ -111,10 +189,13 @@ export default {
           isOnline: false,
           categories: categories,
           role: "USER"
-        });
+        });        
+        sendVerificationEmail(user1);
         return { token: createToken(user1, password, '30m'), user: user1, success: true };
 
       }
+
+
     },
 
     socialSignUp: async (

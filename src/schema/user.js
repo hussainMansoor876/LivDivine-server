@@ -3,6 +3,7 @@ import { gql } from 'apollo-server-express';
 export default gql`
   extend type Query {
     users: [User!]
+    searchUsers(userName: String!): RoleUser!
     user(id: ID!): User    
     getAllUserByRole(role: String!): RoleUser!
     me: User

@@ -14,9 +14,33 @@ import resolvers from './resolvers';
 import models, { sequelize } from './models';
 import loaders from './loaders';
 
+const EMAIL_SECRET = 'asdf1093KMnzxcvnkljvasdu09123nlasdasdf';
 const app = express();
 
-app.use(cors());
+// app.use(cors());
+app.use(cors('*'));
+
+app.get('/confirmation/:token', async (req, res) => {
+  // try {
+    const { user: { id } } = jwt.verify(req.params.token, EMAIL_SECRET);
+    console.log('req.params.token', req.params.token)
+    console.log('EMAIL_SECRET', EMAIL_SECRET)      
+    console.log('id', id)
+    const users = await models.User.findByPk(id)
+    console.log('user', users)
+    if (users) {
+      await models.User.update({ isVerified: true }, { where: { id } });
+      
+    } else {
+      console.log('error')
+    }
+  // } catch (e) {
+  //   res.send('error');
+  //   // return
+  // }
+
+  return res.redirect('https://www.google.com');
+});
 
 const getMe = async req => {
   const token = req.headers['x-token'];
