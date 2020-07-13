@@ -1,14 +1,15 @@
 import bcrypt from 'bcryptjs';
 
 const user = (sequelize, DataTypes) => {
+  const {UUIDV4, STRING, UUID, BOOLEAN} = DataTypes
   const User = sequelize.define('user', {
     id: {
-      type: DataTypes.UUID,
-      defaultValue: DataTypes.UUIDV4,
+      type: UUID,
+      defaultValue: UUIDV4,
       primaryKey: true,
     },
     userName: {
-      type: DataTypes.STRING,
+      type: STRING,
       // unique: true,
       allowNull: false,
       validate: {
@@ -16,7 +17,7 @@ const user = (sequelize, DataTypes) => {
       },
     },
     email: {
-      type: DataTypes.STRING,
+      type: STRING,
       unique: true,
       allowNull: true,
       // validate: {
@@ -25,58 +26,58 @@ const user = (sequelize, DataTypes) => {
       // },
     },
     password: {
-      type: DataTypes.STRING,
+      type: STRING,
     },
-    socialAuthId: {      
-      type: DataTypes.STRING,
+    authId: {      
+      type: STRING,
       unique: true,
       allowNull: true,
     },
     role: {
-      type: DataTypes.STRING,
+      type: STRING,
     },
     otp: {
-      type: DataTypes.STRING,
+      type: STRING,
     },
     image: {
-      type: DataTypes.STRING,
+      type: STRING,
     },
     isVerified: {
-      type: DataTypes.BOOLEAN,
+      type: BOOLEAN,
     },
     isLogin: {
-      type: DataTypes.BOOLEAN,
+      type: BOOLEAN,
     },
     authType: {
-      type: DataTypes.STRING,
+      type: STRING,
     },
     title: {
-      type: DataTypes.STRING,
-    },
-    advisorImage: {
-      type: DataTypes.STRING,
+      type: STRING,
     },
     aboutService: {
-      type: DataTypes.STRING,
+      type: STRING,
       validate: {
-        len: [100, 200],
+        len: [10, 200],
       }
     },
     aboutMe: {
-      type: DataTypes.STRING,
+      type: STRING,
       validate: {
-        len: [50, 200],
+        len: [10, 200],
       }
     },
+    isOnline: {      
+      type: BOOLEAN,
+    },
     categories: {      
-      type: DataTypes.STRING,
+      type: STRING,
     }
   });
 
 
   User.associate = models => {
     User.hasMany(models.Message, { onDelete: 'CASCADE' });
-    // User.hasMany(models.Review, { onDelete: 'CASCADE' });
+    User.hasMany(models.Favourite, { onDelete: 'CASCADE' });
   };
 
   User.findByLogin = async login => {

@@ -14,12 +14,12 @@ export default {
     reviews: async (parent, { cursor, limit = 100 }, { models }) => {
       const cursorOptions = cursor
         ? {
-            where: {
-              createdAt: {
-                [Sequelize.Op.lt]: fromCursorHash(cursor),
-              },
+          where: {
+            createdAt: {
+              [Sequelize.Op.lt]: fromCursorHash(cursor),
             },
-          }
+          },
+        }
         : {};
 
       const reviews = await models.Reviews.findAll({
@@ -41,31 +41,78 @@ export default {
         // },
       };
     },
-    reviews: async (parent, { id }, { models }) => {
+    review: async (parent, { id }, { models }) => {
       return await models.Reviews.findById(id);
     },
+    getReviewByAdvisorId: combineResolvers(
+      // isAuthenticated,
+      // isMessageOwner,
+      async (parent, { advisorId }, { models }) => {
+        console.log('user', advisorId)
+        var userReview = await models.Review.findAll({
+          where: {
+            advisorId: advisorId
+          },
+        });
+
+        if (userReview != "") {
+          console.log('userReview', userReview)
+          return { result: userReview, success: true }
+        } else {
+          console.log('No Review Found')
+          return { message: 'No Review Found', success: false }
+        }
+      },
+    ),
   },
 
   Mutation: {
-    createReviews: combineResolvers(
+    createReviews: async (
+      //  combineResolvers(
       // isAuthenticated,
-      async (parent, { text }, { models, me }) => {
-        const review = await models.Review.create({
-          text,
-          userId: me.id,
-        });
 
-        pubsub.publish(EVENTS.REVIEW.CREATED, {
-          reviewCreated: { review },
-        });
+      parent,
+      body,
+      { models, me }) => {
+      const { ReviewText, reviewType, userId, advisorId} = body
 
-        return review;
-      },
-    ),
+      console.log('body', body)
+      var advisor = await models.User.findById(advisorId);
+      if (advisor) {
+        console.log('advisor', advisor)
+      } else {
+        console.log("No Advisor")
+      }
+      var user = await models.User.findById(userId);
+      if (advisor) {
+        console.log('user', userId)
+      } else {
+        console.log("No user")
+      }
+      const review = await models.Review.create({
+        ReviewText,
+        userId,
+        advisorId,
+        reviewType,
+        userName: user.userName,
+        advisorName: advisor.userName
+      });
+      if (review) {
+        console.log('review', review)
+      } else {
+        console.log('error')
+      }
+      // pubsub.publish(EVENTS.REVIEW.CREATED, {
+      //   reviewCreated: { review },
+      // });
+
+      return review;
+    },
+    // ),
 
     deleteReview: combineResolvers(
-      isAuthenticated,
-      isMessageOwner,
+      // isAuthenticated,
+      // isMessageOwner,
       async (parent, { id }, { models }) => {
         return await models.Review.destroy({ where: { id } });
       },

@@ -3,11 +3,12 @@ import { gql } from 'apollo-server-express';
 export default gql`
   extend type Query {
     reviews(cursor: String, limit: Int): ReviewConnection!
+    getReviewByAdvisorId(advisorId: ID!): ReviewResult!
     review(id: ID!): Review!
   }
 
   extend type Mutation {
-    createReview(text: String!): Review!
+    createReviews(userId: String!, advisorId: String!, ReviewText: String!, reviewType: Boolean!): Review!
     deleteReview(id: ID!): Boolean!
   }
 
@@ -17,11 +18,18 @@ export default gql`
 
   type Review {
     id: ID!
-    text: String!
+    advisorId: ID!
+    reviewType: Boolean!
+    ReviewText: String!
     createdAt: Date!
+    advisorName: String!
     user: User!
   }
-
+  type ReviewResult {
+    result: [Review]
+    review: String
+    success: Boolean
+  }
   extend type Subscription {
     reviewCreated: ReviewCreated!
   }

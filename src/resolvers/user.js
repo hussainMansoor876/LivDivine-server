@@ -5,6 +5,11 @@ import { AuthenticationError, UserInputError } from 'apollo-server';
 var nodemailer = require('nodemailer');
 import { isAdmin, isAuthenticated } from './authorization';
 import { condition } from 'sequelize';
+const { Op } = require("sequelize");
+import _ from 'lodash';
+
+
+const EMAIL_SECRET = 'asdf1093KMnzxcvnkljvasdu09123nlasdasdf';
 
 const createToken = async (user, secret, expiresIn) => {
   const { id, email, userName, role } = user;
@@ -14,6 +19,7 @@ const createToken = async (user, secret, expiresIn) => {
 };
 
 const sendOtpEmail = (user, otp) => {
+
   var transporter = nodemailer.createTransport({
     service: 'gmail',
     auth: {
@@ -28,7 +34,7 @@ const sendOtpEmail = (user, otp) => {
     subject: 'Sending Email using Node.js ' + otp,
     text: 'That was easy! ' + otp
   };
-
+  console.log('otp', user.email)
   transporter.sendMail(mailOptions, function (error, info) {
     if (error) {
       console.log(error);
@@ -37,13 +43,98 @@ const sendOtpEmail = (user, otp) => {
     }
   });
 }
+
+const sendVerificationEmail = (user) => {
+
+  jwt.sign(
+    {
+      user: _.pick(user, 'id'),
+    },
+    EMAIL_SECRET,
+    {
+      expiresIn: '1d',
+    },
+    (err, emailToken) => {
+      // console.log('emailToken', emailToken)
+      const url = `http://localhost:8000/confirmation/${emailToken}`;
+
+      var transporter = nodemailer.createTransport({
+        service: 'gmail',
+        auth: {
+          user: 'Office.seasolconsultancy@gmail.com',
+          pass: 'seasol12346'
+        }
+      });
+
+      var mailOptions = {
+        from: 'Office.seasolconsultancy@gmail.com',
+        to: 'waqasdemo222@gmail.com',
+        subject: 'Confirm Email',
+        html: `Please click this email to confirm your email: <a href="${url}">${url}</a>`,
+      };
+      transporter.sendMail(mailOptions, function (error, info) {
+        if (error) {
+          console.log(error);
+        } else {
+          console.log('Email sent: ' + info.response);
+        }
+      });
+    },
+  );
+
+
+
+
+  // console.log('otp', user.email)
+  // transporter.sendMail(mailOptions, function (error, info) {
+  //   if (error) {
+  //     console.log(error);
+  //   } else {
+  //     console.log('Email sent: ' + info.response);
+  //   }
+  // });
+}
+
 export default {
   Query: {
     users: async (parent, args, { models }) => {
       return await models.User.findAll();
     },
+    searchUsers: async (parent, { userName }, { models }) => {
+      console.log('userName', userName)
+      let searchFor = userName
+      const user = models.User.findAll({
+        where: {
+          userName: {
+            [Op.iRegexp]: userName
+          }
+        },
+      })
+      if (user != "") {
+        console.log('user', user.userName)
+        return { user: user, success: true };
+
+      } else {
+        console.log('No User')
+        return { message: 'No User', success: false }
+      }
+    },
     user: async (parent, { id }, { models }) => {
       return await models.User.findById(id);
+    },
+    getAllUserByRole: async (parent, { role }, { models }) => {
+      var user = await models.User.findAll({
+        where: {
+          role: role
+        }
+      });
+      if (user) {
+        console.log('users', user);
+        return { user: user, success: true }
+      } else {
+        console.log('No User Found')
+        return { message: 'No User Found', success: false }
+      }
     },
     me: async (parent, args, { models, me }) => {
       if (!me) {
@@ -78,8 +169,10 @@ export default {
             userName,
             password,
             isLogin: false,
+            isOnline: false,
             categories: categories
           });
+          sendVerificationEmail(user);
           return { token: createToken(user, password, '30m'), user: user, success: true };
 
         } else {
@@ -93,11 +186,16 @@ export default {
           password,
           isVerified,
           isLogin: false,
-          categories: categories
-        });
+          isOnline: false,
+          categories: categories,
+          role: "USER"
+        });        
+        sendVerificationEmail(user1);
         return { token: createToken(user1, password, '30m'), user: user1, success: true };
 
       }
+
+
     },
 
     socialSignUp: async (
@@ -105,13 +203,13 @@ export default {
       body,
       { models, secret },
     ) => {
-      const { userName, email, socialAuthId, image, authType } = body
+      const { userName, email, authId, image, authType } = body
       if (email) {
         var newUser = await models.User.findOne({
           where: {
             $or: [
               { email: email },
-              { socialAuthId: socialAuthId },
+              { authId: authId },
             ]
           },
           attributes: { exclude: ['password'] }
@@ -120,20 +218,23 @@ export default {
           await newUser.update({
             userName,
             isLogin: true,
+            isOnline: true,
             isVerified: true,
-            socialAuthId,
+            authId,
           });
           return { user: newUser, success: true, };
 
         } else {
           let newUser1 = await models.User.create({
             userName,
-            socialAuthId,
+            authId,
             isVerified: true,
             isLogin: true,
+            isOnline: true,
             authType,
             image,
-            email
+            email,
+            role: "USER"
           }, {
             attributes: { exclude: ['password'] }
           })
@@ -144,7 +245,7 @@ export default {
       else {
         var newUser = await models.User.findOne({
           where: {
-            socialAuthId: socialAuthId
+            authId: authId
           },
           attributes: { exclude: ['password'] }
         });
@@ -153,7 +254,7 @@ export default {
             userName,
             isLogin: true,
             isVerified: true,
-            socialAuthId,
+            authId,
             image,
             authType,
           });
@@ -162,10 +263,11 @@ export default {
         } else {
           let newUser1 = await models.User.create({
             userName,
-            socialAuthId,
+            authId,
             isVerified: true,
             isLogin: true,
-            authType
+            authType,
+            role: "USER"
           }, {
             attributes: { exclude: ['password'] }
           })
@@ -231,7 +333,7 @@ export default {
 
       if (!user) {
 
-        return { success: true, message: 'No user found with this login credentials.' }
+        return { success: false, message: 'No user found with this login credentials.' }
         // throw new UserInputError(
         //   'No user found with this login credentials.',
         // );
@@ -240,11 +342,12 @@ export default {
       const isValid = await user.validatePassword(password);
 
       if (!isValid) {
-        return { success: true, message: 'Invalid password.' }
+        return { success: false, message: 'Invalid password.' }
         // throw new AuthenticationError('Invalid password.');
       }
       await user.update({
         isLogin: true,
+        isOnline: true,
       });
 
       return { token: createToken(user, password, '30m'), user: user, success: true };
@@ -336,6 +439,37 @@ export default {
       },
     ),
 
+
+    becomeAdvisor: combineResolvers(
+      // isAuthenticated,
+      async (
+        parent,
+        body,
+        { models, me }) => {
+        const { email, authId, title, userName, image, role, aboutService, aboutMe, categories, isLogin } = body
+        var newUser = await models.User.find({
+          where: {
+            $or: [
+              { email: email },
+              { authId: authId },
+            ],
+            // email: body.email,
+            isVerified: true
+          },
+        });
+        if (!newUser) {
+          console.log("No User Found")
+          return { message: 'No user found.', success: false }
+          // throw new UserInputError(
+          //   'No user found with this Email.',
+          // );
+        }
+        console.log("else")
+        const user = await models.User.findById(newUser.id);
+        await user.update(body);
+        return { user: user, success: true }
+      },
+    ),
 
     deleteUser: combineResolvers(
       isAdmin,
