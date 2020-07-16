@@ -1,12 +1,13 @@
 const review = (sequelize, DataTypes) => {
+  const {UUIDV4, STRING, UUID, BOOLEAN} = DataTypes
   const Review = sequelize.define('review', {
     id: {
-      type: DataTypes.UUID,
-      defaultValue: DataTypes.UUIDV4,
+      type: UUID,
+      defaultValue: UUIDV4,
       primaryKey: true,
     },
     userName: {
-      type: DataTypes.STRING,
+      type: STRING,
       // unique: true,
       allowNull: false,
       validate: {
@@ -14,7 +15,7 @@ const review = (sequelize, DataTypes) => {
       },
     },
     // userId: {
-    //   type: DataTypes.UUIDV4,
+    //   type: UUIDV4,
     //   // unique: true,
     //   allowNull: false,
     //   validate: {
@@ -22,26 +23,26 @@ const review = (sequelize, DataTypes) => {
     //   },
     // },
     advisorName: {
-      type: DataTypes.STRING,
+      type: STRING,
       // unique: true,
       allowNull: false,
       validate: {
         notEmpty: true,
       },
     },
-    // advisorId: {
-    //   type: DataTypes.UUIDV4,
-    //   // unique: true,
-    //   allowNull: false,
-    //   validate: {
-    //     notEmpty: true,
-    //   },
-    // },
+    advisorId: {
+      type: UUID,
+      // unique: true,
+      allowNull: false,
+      validate: {
+        notEmpty: true,
+      },
+    },
     reviewType: {
-      type: DataTypes.BOOLEAN
+      type: BOOLEAN
     },
     ReviewText: {
-      type: DataTypes.STRING,
+      type: STRING,
       validate: { notEmpty: true },
     },
   });
