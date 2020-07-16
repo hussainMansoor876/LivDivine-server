@@ -3,7 +3,7 @@ const category = (sequelize, DataTypes) => {
   const Category = sequelize.define('category', {
     id: {
       type: UUID,
-      defaultValue: DataTypes.UUIDV4,
+      defaultValue: UUIDV4,
       primaryKey: true,
     },
     name: {
