@@ -69,6 +69,7 @@ const sendVerificationEmail = (user) => {
       var mailOptions = {
         from: 'Office.seasolconsultancy@gmail.com',
         to: 'waqasdemo222@gmail.com',
+        // to: 'bonihe3478@entrastd.com',
         subject: 'Confirm Email',
         html: `Please click this email to confirm your email: <a href="${url}">${url}</a>`,
       };
@@ -100,22 +101,85 @@ export default {
     users: async (parent, args, { models }) => {
       return await models.User.findAll();
     },
-    searchUsers: async (parent, { userName }, { models }) => {
-      console.log('userName', userName)
-      let searchFor = userName
-      const user = models.User.findAll({
-        where: {
-          userName: {
-            [Op.iRegexp]: userName
-          }
-        },
-      })
-      if (user != "") {
-        console.log('user', user.userName)
+    // socialSignUp: async (
+    //   parent,
+    //   body,
+    //   { models, secret },
+    // ) => {
+    searchUsers: async (parent, { userName, role, isOnline, isAdvisor }, { models }) => {
+      let user = "";
+      if (role && isOnline && isAdvisor) {
+        user = models.User.findAll({
+          where: {
+            userName: {
+              [Op.iRegexp]: userName
+            },
+            role: role, isOnline: isOnline, isAdvisor: isAdvisor,
+          },
+        })
+        return { user: user, success: true };
+      }
+      else if (role && isOnline == true) {
+        user = models.User.findAll({
+          where: {
+            userName: {
+              [Op.iRegexp]: userName
+            },
+            role: role, isOnline: isOnline, isAdvisor: false
+          },
+        })
+
+        return { user: user, success: true };
+      }
+      else if (role && isAdvisor == true) {
+        user = models.User.findAll({
+          where: {
+            userName: {
+              [Op.iRegexp]: userName
+            },
+            role: role, isAdvisor: isAdvisor, isOnline: false
+          },
+        })
+
+        return { user: user, success: true };
+      }
+      else if (role && isOnline == false && isAdvisor == false) {
+        user = models.User.findAll({
+          where: {
+            userName: {
+              [Op.iRegexp]: userName
+            },
+            role: role, isAdvisor: false, isOnline: false
+          },
+        })
+        return { user: user, success: true };
+
+      }
+      else if (role) {
+        user = models.User.findAll({
+          where: {
+            userName: {
+              [Op.iRegexp]: userName
+            },
+            role: role
+          },
+        })
         return { user: user, success: true };
 
       } else {
-        console.log('No User')
+        user = models.User.findAll({
+          where: {
+            userName: {
+              [Op.iRegexp]: userName
+            },
+          },
+        })
+      }
+      // let searchFor = body.userName
+      if (user != "") {
+        return { user: user, success: true };
+
+      } else {
         return { message: 'No User', success: false }
       }
     },
@@ -170,6 +234,7 @@ export default {
             password,
             isLogin: false,
             isOnline: false,
+            isAdvisor: false,
             categories: categories
           });
           sendVerificationEmail(user);
@@ -187,9 +252,10 @@ export default {
           isVerified,
           isLogin: false,
           isOnline: false,
+          isAdvisor: false,
           categories: categories,
           role: "USER"
-        });        
+        });
         sendVerificationEmail(user1);
         return { token: createToken(user1, password, '30m'), user: user1, success: true };
 
@@ -220,6 +286,7 @@ export default {
             isLogin: true,
             isOnline: true,
             isVerified: true,
+            isAdvisor: false,
             authId,
           });
           return { user: newUser, success: true, };
@@ -231,6 +298,7 @@ export default {
             isVerified: true,
             isLogin: true,
             isOnline: true,
+            isAdvisor: false,
             authType,
             image,
             email,
@@ -254,6 +322,7 @@ export default {
             userName,
             isLogin: true,
             isVerified: true,
+            isAdvisor: false,
             authId,
             image,
             authType,
@@ -266,6 +335,7 @@ export default {
             authId,
             isVerified: true,
             isLogin: true,
+            isAdvisor: false,
             authType,
             role: "USER"
           }, {
@@ -446,7 +516,7 @@ export default {
         parent,
         body,
         { models, me }) => {
-        const { email, authId, title, userName, image, role, aboutService, aboutMe, categories, isLogin } = body
+        const { email, authId, title, userName, image, role, aboutService, aboutMe, isLogin, isAdvisor, isOnline } = body
         var newUser = await models.User.find({
           where: {
             $or: [

@@ -1,0 +1,26 @@
+{
+  "development": {
+    "username": "postgres",
+    "password": "Sseasol@)!(2020",
+    "database": "mytestdatabase",
+    "host": "localhost",
+    "dialect": "postgres",
+    "port": 5000
+  },
+  "test": {
+    "username": "postgres",
+    "password": "Sseasol@)!(2020",
+    "database": "mytestdatabase",
+    "host": "localhost",
+    "dialect": "postgres",
+    "port": 5000
+  },
+  "production": {
+    "username": "postgres",
+    "password": "Sseasol@)!(2020",
+    "database": "mytestdatabase",
+    "host": "localhost",
+    "dialect": "postgres",
+    "port": 5000
+  }
+}

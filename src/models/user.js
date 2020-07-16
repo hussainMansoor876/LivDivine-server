@@ -69,9 +69,12 @@ const user = (sequelize, DataTypes) => {
     isOnline: {      
       type: BOOLEAN,
     },
-    categories: {      
-      type: STRING,
-    }
+    isAdvisor: {      
+      type: BOOLEAN,
+    },
+    // categories: {      
+    //   type: STRING,
+    // }
   });
 
 
