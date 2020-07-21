@@ -29,6 +29,8 @@ const models = {
   Favourite: sequelize.import('./favourite'),
   Category: sequelize.import('./category'),
   UserCategory: sequelize.import('./userCategory'),
+  OrderType: sequelize.import('./orderType'),
+  UserOrderType: sequelize.import('./userOrderType'),
 };
 
 Object.keys(models).forEach(key => {
