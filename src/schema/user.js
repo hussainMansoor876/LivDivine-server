@@ -15,12 +15,11 @@ export default gql`
       email: String!
       password: String
       isVerified: Boolean!
-      categories: String
     ): Token!
     socialSignUp(userName: String!, email: String, authType: String!, authId: String!, image: String ): Token!
     signIn(login: String!, password: String!): Token!
     forgotPassword(email: String!, password: String!, otp: String!): Token!
-    updateUser(email: String!, userName: String, image: String, isLogin: Boolean, isOnline: Boolean, isAdvisor: Boolean): Token!
+    updateUser(email: String!, userName: String, image: String, isLogin: Boolean, isOnline: Boolean, isAdvisor: Boolean, isApproved: Boolean): Token!
     updatePassword(email: String!, password: String!): Token!
     updateVerified(email: String!): Token!    
     becomeAdvisor(email: String,authId: String, userName: String, title: String, image: String, 
@@ -45,6 +44,9 @@ export default gql`
   type Categories {
     categories: String!
   }
+  type OrderTypes {
+    orderTypes: String!
+  }
 
   type User {
     id: ID!
@@ -58,11 +60,11 @@ export default gql`
     isLogin: Boolean!
     isAdvisor: Boolean
     isOnline: Boolean
+    isApproved: Boolean
     authType: String
     title: String
     aimage: String
     aboutService: String
     aboutMe: String
-    categories: String
   }
 `;

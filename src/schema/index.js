@@ -6,6 +6,8 @@ import reviewSchema from './review';
 import favouriteSchema from './favourite';
 import categorySchema from './category';
 import userCategorySchema from './userCategory';
+import orderTypeSchema from './orderType';
+import userOrderTypeSchema from './userOrderType';
 
 const linkSchema = gql`
   scalar Date
@@ -23,4 +25,4 @@ const linkSchema = gql`
   }
 `;
 
-export default [linkSchema, userSchema, messageSchema, reviewSchema, favouriteSchema, categorySchema, userCategorySchema];
+export default [linkSchema, userSchema, messageSchema, reviewSchema, favouriteSchema, categorySchema, userCategorySchema, , orderTypeSchema, userOrderTypeSchema];

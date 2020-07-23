@@ -115,6 +115,7 @@ export default {
               [Op.iRegexp]: userName
             },
             role: role, isOnline: isOnline, isAdvisor: isAdvisor,
+            isApproved: true,
           },
         })
         return { user: user, success: true };
@@ -125,7 +126,8 @@ export default {
             userName: {
               [Op.iRegexp]: userName
             },
-            role: role, isOnline: isOnline, isAdvisor: false
+            role: role, isOnline: isOnline, isAdvisor: false,
+            isApproved: true,
           },
         })
 
@@ -137,7 +139,8 @@ export default {
             userName: {
               [Op.iRegexp]: userName
             },
-            role: role, isAdvisor: isAdvisor, isOnline: false
+            role: role, isAdvisor: isAdvisor, isOnline: false,
+            isApproved: true,
           },
         })
 
@@ -149,7 +152,8 @@ export default {
             userName: {
               [Op.iRegexp]: userName
             },
-            role: role, isAdvisor: false, isOnline: false
+            role: role, isAdvisor: false, isOnline: false,
+            isApproved: true,
           },
         })
         return { user: user, success: true };
@@ -161,7 +165,8 @@ export default {
             userName: {
               [Op.iRegexp]: userName
             },
-            role: role
+            role: role,
+            isApproved: true,
           },
         })
         return { user: user, success: true };
@@ -172,6 +177,7 @@ export default {
             userName: {
               [Op.iRegexp]: userName
             },
+            isApproved: true,
           },
         })
       }
@@ -212,7 +218,7 @@ export default {
   Mutation: {
     signUp: async (
       parent,
-      { userName, email, password, isVerified, categories },
+      { userName, email, password, isVerified },
       { models, secret },
     ) => {
 
@@ -235,7 +241,8 @@ export default {
             isLogin: false,
             isOnline: false,
             isAdvisor: false,
-            categories: categories
+            isApproved: false,
+            // categories: categories
           });
           sendVerificationEmail(user);
           return { token: createToken(user, password, '30m'), user: user, success: true };
@@ -253,7 +260,8 @@ export default {
           isLogin: false,
           isOnline: false,
           isAdvisor: false,
-          categories: categories,
+          isApproved: false,
+          // categories: categories,
           role: "USER"
         });
         sendVerificationEmail(user1);
@@ -287,6 +295,7 @@ export default {
             isOnline: true,
             isVerified: true,
             isAdvisor: false,
+            isApproved: false,
             authId,
           });
           return { user: newUser, success: true, };
@@ -299,6 +308,7 @@ export default {
             isLogin: true,
             isOnline: true,
             isAdvisor: false,
+            isApproved: false,
             authType,
             image,
             email,
@@ -323,6 +333,7 @@ export default {
             isLogin: true,
             isVerified: true,
             isAdvisor: false,
+            isApproved: false,
             authId,
             image,
             authType,
@@ -336,6 +347,7 @@ export default {
             isVerified: true,
             isLogin: true,
             isAdvisor: false,
+            isApproved: false,
             authType,
             role: "USER"
           }, {
@@ -489,7 +501,7 @@ export default {
         if (newUser) {
           if (newUser.isVerified === false) {
             const user = await models.User.findById(newUser.id);
-            await user.update({ isVerified });
+            await user.update({ isVerified: true });
             return { user: user, success: true }
           }
           else {
