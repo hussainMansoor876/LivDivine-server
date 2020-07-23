@@ -6,6 +6,8 @@ import reviewResolvers from '../resolvers/review';
 import favouriteResolvers from '../resolvers/favourite';
 import categoryResolvers from '../resolvers/category';
 import userCategoryResolvers from '../resolvers/userCategory';
+import orderTypeResolvers from '../resolvers/orderType';
+import userOrderTypeResolvers from '../resolvers/userOrderType';
 
 const customScalarResolver = {
   Date: GraphQLDateTime,
@@ -18,5 +20,7 @@ export default [
   reviewResolvers,
   favouriteResolvers,
   categoryResolvers,
-  userCategoryResolvers
+  userCategoryResolvers,
+  orderTypeResolvers,
+  userOrderTypeResolvers
 ];

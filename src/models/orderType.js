@@ -1,6 +1,6 @@
-const category = (sequelize, DataTypes) => {
+const orderType = (sequelize, DataTypes) => {
   const {UUIDV4, STRING, UUID} = DataTypes
-  const Category = sequelize.define('category', {
+  const OrderType = sequelize.define('orderType', {
     id: {
       type: UUID,
       defaultValue: UUIDV4,
@@ -16,11 +16,11 @@ const category = (sequelize, DataTypes) => {
     },
   });
 
-  // Category.associate = models => {
-  //   Category.belongsTo(models.User);
+  // OrderType.associate = models => {
+  //   OrderType.belongsTo(models.User);
   // };
 
-  return Category;
+  return OrderType;
 };
 
-export default category;
+export default orderType;

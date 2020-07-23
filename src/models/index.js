@@ -2,10 +2,15 @@ import Sequelize from 'sequelize';
 
 let sequelize;
 if (process.env.DATABASE_URL) {
-  sequelize = new Sequelize(process.env.DATABASE_URL, {
+  console.log('this')
+  sequelize = new Sequelize(
+    process.env.DATABASE_URL, {
     dialect: 'postgres',
   });
 } else {
+
+  console.log('process.env.TEST_DATABASE',process.env.TEST_DATABASE )
+  console.log('process.env.DATABASE',process.env.DATABASE )
   sequelize = new Sequelize(
     process.env.TEST_DATABASE || process.env.DATABASE,
     process.env.DATABASE_USER,
@@ -24,6 +29,8 @@ const models = {
   Favourite: sequelize.import('./favourite'),
   Category: sequelize.import('./category'),
   UserCategory: sequelize.import('./userCategory'),
+  OrderType: sequelize.import('./orderType'),
+  UserOrderType: sequelize.import('./userOrderType'),
 };
 
 Object.keys(models).forEach(key => {

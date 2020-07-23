@@ -3,7 +3,7 @@ import { gql } from 'apollo-server-express';
 export default gql`
   extend type Query {
     users: [User!]
-    searchUsers(userName: String!): RoleUser!
+    searchUsers(userName: String!, role: String, isOnline: Boolean, isAdvisor: Boolean): RoleUser!
     user(id: ID!): User    
     getAllUserByRole(role: String!): RoleUser!
     me: User
@@ -15,16 +15,15 @@ export default gql`
       email: String!
       password: String
       isVerified: Boolean!
-      categories: String
     ): Token!
     socialSignUp(userName: String!, email: String, authType: String!, authId: String!, image: String ): Token!
     signIn(login: String!, password: String!): Token!
     forgotPassword(email: String!, password: String!, otp: String!): Token!
-    updateUser(email: String!, userName: String, image: String, isLogin: Boolean, isOnline: Boolean): Token!
+    updateUser(email: String!, userName: String, image: String, isLogin: Boolean, isOnline: Boolean, isAdvisor: Boolean, isApproved: Boolean): Token!
     updatePassword(email: String!, password: String!): Token!
-    updateVerified(email: String!, isVerified: Boolean!): Token!    
+    updateVerified(email: String!): Token!    
     becomeAdvisor(email: String,authId: String, userName: String, title: String, image: String, 
-      role: String, aboutService: String, aboutMe: String,categories: String isLogin: Boolean): Token!
+      role: String, aboutService: String, aboutMe: String, isLogin: Boolean, isAdvisor: Boolean, isOnline: Boolean): Token!
     deleteUser(id: ID!): Boolean!
   }
 
@@ -45,6 +44,9 @@ export default gql`
   type Categories {
     categories: String!
   }
+  type OrderTypes {
+    orderTypes: String!
+  }
 
   type User {
     id: ID!
@@ -56,12 +58,13 @@ export default gql`
     image: String
     isVerified: Boolean!
     isLogin: Boolean!
+    isAdvisor: Boolean
     isOnline: Boolean
+    isApproved: Boolean
     authType: String
     title: String
     aimage: String
     aboutService: String
     aboutMe: String
-    categories: String
   }
 `;

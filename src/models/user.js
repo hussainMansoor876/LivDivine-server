@@ -1,7 +1,7 @@
 import bcrypt from 'bcryptjs';
 
 const user = (sequelize, DataTypes) => {
-  const {UUIDV4, STRING, UUID, BOOLEAN} = DataTypes
+  const { UUIDV4, STRING, UUID, BOOLEAN } = DataTypes
   const User = sequelize.define('user', {
     id: {
       type: UUID,
@@ -28,7 +28,7 @@ const user = (sequelize, DataTypes) => {
     password: {
       type: STRING,
     },
-    authId: {      
+    authId: {
       type: STRING,
       unique: true,
       allowNull: true,
@@ -66,11 +66,14 @@ const user = (sequelize, DataTypes) => {
         len: [10, 200],
       }
     },
-    isOnline: {      
+    isOnline: {
       type: BOOLEAN,
     },
-    categories: {      
-      type: STRING,
+    isAdvisor: {
+      type: BOOLEAN,
+    },
+    isApproved: {
+      type: BOOLEAN,
     }
   });
 
