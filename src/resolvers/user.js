@@ -548,7 +548,7 @@ export default {
         parent,
         body,
         { models, me }) => {
-        const { id, title, userName, image, role, aboutService, aboutMe, isLogin, isAdvisor, isOnline } = body
+        const { id, title, userName, image, role, aboutService, aboutMe, isLogin, isAdvisor, isOnline, videoThumbnail } = body
         var newUser = await models.User.find({
           where: {
             // $or: [
