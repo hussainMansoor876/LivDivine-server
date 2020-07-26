@@ -18,11 +18,11 @@ export default gql`
     ): Token!
     socialSignUp(userName: String!, email: String, authType: String!, authId: String!, image: String ): Token!
     signIn(login: String!, password: String!): Token!
-    forgotPassword(email: String!, password: String!, otp: String!): Token!
+    forgotPassword(id: String!, password: String!, otp: String!): Token!
     updateUser(id: String!, userName: String, image: String, isLogin: Boolean, isOnline: Boolean, isAdvisor: Boolean, isApproved: Boolean): Token!
-    updatePassword(email: String!, password: String!): Token!
-    updateVerified(email: String!): Token!    
-    becomeAdvisor(email: String,authId: String, userName: String, title: String, image: String, 
+    updatePassword(id: String!,currentPassword: String, password: String!): Token!
+    updateVerified(id: String!): Token!    
+    becomeAdvisor(id: String,authId: String, userName: String, title: String, image: String, videoThumbnail: String,
       role: String, aboutService: String, aboutMe: String, isLogin: Boolean, isAdvisor: Boolean, isOnline: Boolean): Token!
     deleteUser(id: ID!): Boolean!
   }
@@ -66,5 +66,6 @@ export default gql`
     aimage: String
     aboutService: String
     aboutMe: String
+    videoThumbnail: String
   }
 `;
