@@ -23,7 +23,7 @@ export default gql`
     updatePassword(id: String!,currentPassword: String, password: String!): Token!
     updateVerified(id: String!): Token!    
     becomeAdvisor(id: String,authId: String, userName: String, title: String, image: String, videoThumbnail: String,
-      role: String, aboutService: String, aboutMe: String, isLogin: Boolean, isAdvisor: Boolean, isOnline: Boolean): Token!
+      role: String, aboutService: String, aboutMe: String, isLogin: Boolean, isAdvisor: Boolean, isOnline: Boolean, video: String!): Token!
     deleteUser(id: ID!): Boolean!
   }
 
@@ -66,6 +66,7 @@ export default gql`
     aimage: String
     aboutService: String
     aboutMe: String
-    videoThumbnail: String
+    videoThumbnail: String,
+    video: String!
   }
 `;
