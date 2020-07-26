@@ -42,6 +42,9 @@ const user = (sequelize, DataTypes) => {
     image: {
       type: STRING,
     },
+    videoThumbnail: {
+      type: STRING,
+    },
     isVerified: {
       type: BOOLEAN,
     },

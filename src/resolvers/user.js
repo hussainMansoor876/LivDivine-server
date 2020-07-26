@@ -361,16 +361,16 @@ export default {
 
     forgotPassword: async (
       parent,
-      { email, password, otp },
+      { id, password, otp },
       { models, secret },
     ) => {
       var user = await models.User.find({
         where: {
-          email: email,
+          id: id,
         },
       });
       if (!user) {
-        return { success: false, message: 'No user found with this Email.' }
+        return { success: false, message: 'No user found' }
         // throw new UserInputError(
         //   'No user found with this Email.',
         // );
@@ -443,12 +443,12 @@ export default {
         { models, me }) => {
         var newUser = await models.User.find({
           where: {
-            email: body.email,
+            id: body.id,
             isVerified: true
           },
         });
         if (!newUser) {
-          return { message: 'No user found with this Email.', success: false }
+          return { message: 'No user found', success: false }
           // throw new UserInputError(
           //   'No user found with this Email.',
           // );
@@ -464,26 +464,46 @@ export default {
       // isAuthenticated,
       async (
         parent,
-        { email, password },
+        { id, currentPassword, password },
         { models, me }) => {
-        var newUser = await models.User.find({
-          where: {
-            email: email, isVerified: true
-          },
-        });
-        if (!newUser) {
-          return { success: false, message: 'No user found with this Email.' }
-          // throw new UserInputError(
-          //   'No user found with this Email.',
-          // );
-        }
-        const user = await models.User.findById(newUser.id);
-        var pass = password;
 
         const saltRounds = 10;
-        password = await bcrypt.hash(pass, saltRounds);
-        await user.update({ password });
-        return { user: user, success: true }
+
+        var newUser = await models.User.find({
+          where: {
+            id: id, isVerified: true,
+          },
+        });
+        if (newUser) {
+          var currentPass = await newUser.validatePassword(currentPassword);
+          console.log('currentPass', currentPass)
+          if (!currentPass) {
+            return { success: false, message: 'Old password is typed incorrectly...' }
+          }
+          var pass = password;
+
+          password = await bcrypt.hash(pass, saltRounds);
+          await newUser.update({ password });
+          return { user: newUser, success: true }
+        } else {
+          return { success: false, message: 'No user found' }
+
+        }
+
+
+        // if (!newUser) {
+        //   return { success: false, message: 'No user found' }
+        // }
+        // else if (newUser.password != currentPass) {
+        //   return { success: false, message: 'Old password is typed incorrectly...' }
+
+        // }
+        // const user = await models.User.findById(newUser.id);
+        // var pass = password;
+
+        // password = await bcrypt.hash(pass, saltRounds);
+        // await user.update({ password });
+        // return { user: user, success: true }
       },
     ),
 
@@ -491,11 +511,11 @@ export default {
       // isAuthenticated,
       async (
         parent,
-        { email, isVerified },
+        { id, isVerified },
         { models, me }) => {
         var newUser = await models.User.find({
           where: {
-            email: email,
+            id: id,
           },
         });
         if (newUser) {
@@ -505,14 +525,14 @@ export default {
             return { user: user, success: true }
           }
           else {
-            return { success: false, message: 'Email is already verified! Please Login...' }
+            return { success: false, message: 'User is already verified! Please Login...' }
             // throw new UserInputError(
             //   'Email is already verified! Please Login...',
             // );
           }
         }
         else {
-          return { success: false, message: 'No user found with this Email.' }
+          return { success: false, message: 'No user found.' }
           // throw new UserInputError(
           //   'No user found with this Email.',
           // );
@@ -528,14 +548,14 @@ export default {
         parent,
         body,
         { models, me }) => {
-        const { email, authId, title, userName, image, role, aboutService, aboutMe, isLogin, isAdvisor, isOnline } = body
+        const { id, title, userName, image, role, aboutService, aboutMe, isLogin, isAdvisor, isOnline, videoThumbnail } = body
         var newUser = await models.User.find({
           where: {
-            $or: [
-              { email: email },
-              { authId: authId },
-            ],
-            // email: body.email,
+            // $or: [
+            //   { email: email },
+            //   { authId: authId },
+            // ],
+            id: body.id,
             isVerified: true
           },
         });
