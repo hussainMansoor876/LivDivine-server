@@ -244,7 +244,7 @@ export default {
             isApproved: false,
             // categories: categories
           });
-          sendVerificationEmail(user);
+          // sendVerificationEmail(user);
           return { token: createToken(user, password, '30m'), user: user, success: true };
 
         } else {
@@ -264,7 +264,7 @@ export default {
           // categories: categories,
           role: "USER"
         });
-        sendVerificationEmail(user1);
+        // sendVerificationEmail(user1);
         return { token: createToken(user1, password, '30m'), user: user1, success: true };
 
       }
@@ -443,7 +443,7 @@ export default {
         { models, me }) => {
         var newUser = await models.User.find({
           where: {
-            email: body.email,
+            id: body.id,
             isVerified: true
           },
         });
