@@ -7,7 +7,7 @@ export default gql`
   }
 
   extend type Mutation {
-    createOrderType(createdBy: ID!, name: String!): OrderType!
+    createOrderType(name: String!): OrderType!
     deleteOrderType(id: ID!): Boolean!
   }
 
@@ -19,8 +19,7 @@ export default gql`
   type OrderType {
     id: ID!
     name: String!
-    createdAt: Date!
-    createdBy: ID!    
+    createdAt: Date! 
   }
 
   extend type Subscription {

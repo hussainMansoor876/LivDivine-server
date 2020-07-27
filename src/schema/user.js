@@ -23,7 +23,8 @@ export default gql`
     updatePassword(id: String!,currentPassword: String, password: String!): Token!
     updateVerified(id: String!): Token!    
     becomeAdvisor(id: String,authId: String, userName: String, title: String, image: String, videoThumbnail: String,
-      role: String, aboutService: String, aboutMe: String, isLogin: Boolean, isAdvisor: Boolean, isOnline: Boolean): Token!
+      role: String, aboutService: String, aboutMe: String, isLogin: Boolean, isAdvisor: Boolean, isOnline: Boolean,
+      categories: [String], orderTypes: [String]): Token!
     deleteUser(id: ID!): Boolean!
   }
 
@@ -32,6 +33,8 @@ export default gql`
     user: User
     message: String
     success: Boolean!
+    categories: [Categories],
+    orderTypes: [OrderTypes]
   }
   type RoleUser {
     user: [User]
@@ -42,10 +45,18 @@ export default gql`
     messages: String!
   }
   type Categories {
-    categories: String!
+    id: String    
+    userId: String,
+    userName: String,
+    categoryId: String,
+    categoryName: String,
   }
   type OrderTypes {
-    orderTypes: String!
+    id: String    
+    userId: String,
+    userName: String,
+    OrderTypeId: String,
+    OrderTypeName: String,
   }
 
   type User {
@@ -66,6 +77,8 @@ export default gql`
     aimage: String
     aboutService: String
     aboutMe: String
-    videoThumbnail: String
+    videoThumbnail: String,
+    categories: [Categories]
+    orderTypes: [OrderTypes]
   }
 `;

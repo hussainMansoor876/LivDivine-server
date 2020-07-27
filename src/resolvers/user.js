@@ -7,6 +7,7 @@ import { isAdmin, isAuthenticated } from './authorization';
 import { condition } from 'sequelize';
 const { Op } = require("sequelize");
 import _ from 'lodash';
+import userCategory from '../schema/userCategory';
 
 
 const EMAIL_SECRET = 'asdf1093KMnzxcvnkljvasdu09123nlasdasdf';
@@ -96,6 +97,35 @@ const sendVerificationEmail = (user) => {
   // });
 }
 
+let getUserCategories = async (id) => {
+  // const { id } = user;
+  var userCategory = await models.UserCategory.findAll({
+    where: {
+      userId: id
+    },
+  });
+
+  if (userCategory != "") {
+    console.log('userCategory', userCategory)
+    return await userCategory;
+  }
+};
+
+let getUserOrderType = async (id) => {
+  // const { id } = user;
+  var userOrderType = await models.UserOrderType.findAll({
+    where: {
+      userId: id
+    },
+  });
+
+  if (userOrderType != "") {
+    console.log('UserOrderType', userOrderType)
+    return userOrderType;
+  }
+};
+
+
 export default {
   Query: {
     users: async (parent, args, { models }) => {
@@ -109,18 +139,21 @@ export default {
     searchUsers: async (parent, { userName, role, isOnline, isAdvisor }, { models }) => {
       let user = "";
       if (role && isOnline && isAdvisor) {
+        console.log('role && isOnline && isAdvisor', role, isOnline, isAdvisor)
         user = models.User.findAll({
           where: {
             userName: {
               [Op.iRegexp]: userName
             },
             role: role, isOnline: isOnline, isAdvisor: isAdvisor,
-            isApproved: true,
+            // isApproved: true,
           },
         })
         return { user: user, success: true };
       }
       else if (role && isOnline == true) {
+
+        console.log('role && isOnline', role, isOnline)
         user = models.User.findAll({
           where: {
             userName: {
@@ -134,6 +167,7 @@ export default {
         return { user: user, success: true };
       }
       else if (role && isAdvisor == true) {
+        console.log('role && isAdvisor', role, isAdvisor)
         user = models.User.findAll({
           where: {
             userName: {
@@ -147,6 +181,7 @@ export default {
         return { user: user, success: true };
       }
       else if (role && isOnline == false && isAdvisor == false) {
+        console.log('role && isOnline == false && isAdvisor == false', role, isOnline, isAdvisor)
         user = models.User.findAll({
           where: {
             userName: {
@@ -160,6 +195,7 @@ export default {
 
       }
       else if (role) {
+        console.log('role', role)
         user = models.User.findAll({
           where: {
             userName: {
@@ -172,6 +208,7 @@ export default {
         return { user: user, success: true };
 
       } else {
+        console.log('else')
         user = models.User.findAll({
           where: {
             userName: {
@@ -548,7 +585,9 @@ export default {
         parent,
         body,
         { models, me }) => {
-        const { id, title, userName, image, role, aboutService, aboutMe, isLogin, isAdvisor, isOnline, videoThumbnail } = body
+        const { id, title, userName, image, role, aboutService, aboutMe, isLogin, isAdvisor, isOnline, videoThumbnail,
+          categories, orderTypes } = body
+        // console.log('orderTypes', orderTypes)
         var newUser = await models.User.find({
           where: {
             // $or: [
@@ -568,8 +607,54 @@ export default {
         }
         console.log("else")
         const user = await models.User.findById(newUser.id);
+        // var userCat = "";
+        var userOrderType = [];
+        var userCategory = [];
+        // await orderTypes.forEach(async element1 => {
+        //   const orderTypessss = await models.OrderType.findById(element1);
+        //   var userOrderTyp = models.UserOrderType.create({
+        //     userId: user.id,
+        //     userName: user.userName,
+        //     orderTypeId: orderTypessss.id,
+        //     orderTypeName: orderTypessss.name
+        //   });
+        //   userOrderType.push(userOrderTyp);
+
+        // });
+        if (orderTypes) {
+          for (var i in orderTypes) {
+            const orderTypessss = await models.OrderType.find({
+              where: { name: orderTypes[i] },
+            });
+            // .findById(orderTypes[i]);
+            let userOrderTyp = await models.UserOrderType.create({
+              userId: user.id,
+              userName: user.userName,
+              orderTypeId: orderTypessss.id,
+              orderTypeName: orderTypessss.name
+            });
+            userOrderType.push(userOrderTyp.dataValues);
+          }
+
+        }
+        if (categories) {
+          for (var i in categories) {
+            const cate = await models.Category.find({
+              where: { name: categories[i] },
+            });
+            // .findById(categories[i]);
+            let userCat = await models.UserCategory.create({
+              userId: user.id,
+              userName: user.userName,
+              categoryId: cate.id,
+              categoryName: cate.name
+            });
+            userCategory.push(userCat.dataValues);
+          }
+
+        }
         await user.update(body);
-        return { user: user, success: true }
+        return { user: user, categories: userCategory, orderTypes: userOrderType, success: true }
       },
     ),
 

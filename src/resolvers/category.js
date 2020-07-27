@@ -68,14 +68,14 @@ export default {
   },
 
   Mutation: {
-    createCategory: async (parent, { name, createdBy }, { models, me }) => {
+    createCategory: async (parent, { name }, { models, me }) => {
       // combineResolvers(
       // isAuthenticated,
       console.log('name', name)
 
       const category = await models.Category.create({
         name: name,
-        createdBy: createdBy
+        // createdBy: createdBy
       });
       console.log('category', category)
       // pubsub.publish(EVENTS.CATEGORY.CREATED, {

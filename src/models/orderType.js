@@ -10,10 +10,10 @@ const orderType = (sequelize, DataTypes) => {
       type: STRING,
       validate: { notEmpty: true },
     },
-    createdBy: {
-      type: UUID,
-      validate: { notEmpty: true },
-    },
+    // createdBy: {
+    //   type: UUID,
+    //   validate: { notEmpty: true },
+    // },
   });
 
   // OrderType.associate = models => {

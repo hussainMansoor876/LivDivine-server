@@ -7,7 +7,7 @@ export default gql`
   }
 
   extend type Mutation {
-    createCategory(createdBy: ID!, name: String!): Category!
+    createCategory(name: String!): Category!
     deleteCategory(id: ID!): Boolean!
   }
 
@@ -20,7 +20,6 @@ export default gql`
     id: ID!
     name: String!
     createdAt: Date!
-    createdBy: ID!    
   }
 
   extend type Subscription {

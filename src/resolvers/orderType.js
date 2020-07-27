@@ -68,14 +68,14 @@ export default {
   },
 
   Mutation: {
-    createOrderType: async (parent, { name, createdBy }, { models, me }) => {
+    createOrderType: async (parent, { name }, { models, me }) => {
       // combineResolvers(
       // isAuthenticated,
       console.log('name', name)
 
       const orderType = await models.OrderType.create({
         name: name,
-        createdBy: createdBy
+        // createdBy: createdBy
       });
       console.log('orderType', orderType)
       // pubsub.publish(EVENTS.ORDERTYPE.CREATED, {
