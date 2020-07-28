@@ -7,13 +7,19 @@ export default gql`
   }
 
   extend type Mutation {
-    createCategory(name: String!): Category!
+    createCategory(name: String!): CategoryResult!
     deleteCategory(id: ID!): Boolean!
   }
 
   type CategoryConnection {
     edges: [Category!]!
     pageInfo: PageInfo!
+  }
+
+  type CategoryResult {
+    category: Category
+    message: String
+    success: Boolean
   }
 
   type Category {

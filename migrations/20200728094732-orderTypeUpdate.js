@@ -2,12 +2,19 @@
 
 module.exports = {
   up: async (queryInterface, Sequelize) => {
-    const { STRING } = Sequelize
+    const { STRING, FLOAT } = Sequelize
     await queryInterface.addColumn(
-      'users',
-      'videoThumbnail',
+      'orderTypes',
+      'subTitle',
       {
         type: STRING,
+      }
+    );
+    await queryInterface.addColumn(
+      'orderTypes',
+      'price',
+      {
+        type: FLOAT,
       }
     );
   },

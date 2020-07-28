@@ -68,21 +68,49 @@ export default {
   },
 
   Mutation: {
-    createOrderType: async (parent, { name }, { models, me }) => {
+    createOrderType: async (parent, { name, subTitle, price }, { models, me }) => {
+      // combineResolvers(
+      // isAuthenticated,
+      var ordertypesss = await models.OrderType.find({
+        where: {
+          name: name,
+        },
+      });
+      if (!ordertypesss) {
+        const orderType = await models.OrderType.create({
+          name: name,
+          subTitle: subTitle,
+          price: price
+          // createdBy: createdBy
+        });
+
+        return { orderType: orderType, success: true };
+
+      } else {
+        return { message: "Order Type Already Exist", success: false };
+      }
+    },
+    updateOrderType: async (parent, { name, price }, { models, me }) => {
       // combineResolvers(
       // isAuthenticated,
       console.log('name', name)
-
-      const orderType = await models.OrderType.create({
-        name: name,
-        // createdBy: createdBy
+      var ordertypesss = await models.OrderType.find({
+        where: {
+          name: name,
+        },
       });
-      console.log('orderType', orderType)
-      // pubsub.publish(EVENTS.ORDERTYPE.CREATED, {
-      //   orderTypeCreated: { orderType },
-      // });
+      console.log('ordertypesss', ordertypesss)
+      if (ordertypesss) {
 
-      return orderType;
+        var orderType = await ordertypesss.update({
+          price: price
+        });
+
+        return { orderType: orderType, success: true };
+
+      } else {
+        return { message: "Order Type Does not Exist", success: false };
+      }
     },
     // ),
 

@@ -3,11 +3,12 @@ import { gql } from 'apollo-server-express';
 export default gql`
   extend type Query {
     orderTypes(cursor: String, limit: Int): OrderTypeConnection!
-    orderType(id: ID!): OrderType!
+    orderType(id: ID!): OrderTypeResult!
   }
 
   extend type Mutation {
-    createOrderType(name: String!): OrderType!
+    createOrderType(name: String!, subTitle: String!, price: Float!): OrderTypeResult!
+    updateOrderType(name: String!, price: Float): OrderTypeResult!
     deleteOrderType(id: ID!): Boolean!
   }
 
@@ -16,9 +17,16 @@ export default gql`
     pageInfo: PageInfo!
   }
 
+  type OrderTypeResult {
+    orderType: OrderType
+    message: String
+    success: Boolean!
+  }
   type OrderType {
     id: ID!
     name: String!
+    subTitle: String!
+    price: Float!
     createdAt: Date! 
   }
 

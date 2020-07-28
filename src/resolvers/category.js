@@ -71,18 +71,25 @@ export default {
     createCategory: async (parent, { name }, { models, me }) => {
       // combineResolvers(
       // isAuthenticated,
-      console.log('name', name)
-
-      const category = await models.Category.create({
-        name: name,
-        // createdBy: createdBy
+      var categories = await models.Category.find({
+        where: {
+          name: name,
+        },
       });
-      console.log('category', category)
-      // pubsub.publish(EVENTS.CATEGORY.CREATED, {
-      //   categoryCreated: { category },
-      // });
+      if (!categories) {
+        const category = await models.Category.create({
+          name: name,
+          // createdBy: createdBy
+        });
+        // pubsub.publish(EVENTS.CATEGORY.CREATED, {
+        //   categoryCreated: { category },
+        // });
 
-      return category;
+        return { category: category, success: true };
+
+      } else {
+        return { message: "Category Already Exist", success: false };
+      }
     },
     // ),
 
