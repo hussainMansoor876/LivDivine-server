@@ -608,32 +608,26 @@ export default {
         console.log("else")
         const user = await models.User.findById(newUser.id);
         // var userCat = "";
+
         var userOrderType = [];
         var userCategory = [];
-        // await orderTypes.forEach(async element1 => {
-        //   const orderTypessss = await models.OrderType.findById(element1);
-        //   var userOrderTyp = models.UserOrderType.create({
-        //     userId: user.id,
-        //     userName: user.userName,
-        //     orderTypeId: orderTypessss.id,
-        //     orderTypeName: orderTypessss.name
-        //   });
-        //   userOrderType.push(userOrderTyp);
 
-        // });
         if (orderTypes) {
           for (var i in orderTypes) {
-            const orderTypessss = await models.OrderType.find({
-              where: { name: orderTypes[i] },
-            });
+            console.log('orderTypes', orderTypes[i])
+            // const orderTypessss = await models.OrderType.find({
+            //   where: { name: orderTypes[i] },
+            // });
             // .findById(orderTypes[i]);
             let userOrderTyp = await models.UserOrderType.create({
               userId: user.id,
               userName: user.userName,
-              orderTypeId: orderTypessss.id,
-              orderTypeName: orderTypessss.name
+              // orderTypeId: orderTypessss.id,
+              subTitle: orderTypes[i].subTitle,
+              price: orderTypes[i].price,
+              orderTypeName: orderTypes[i].orderTypeName
             });
-            userOrderType.push(userOrderTyp.dataValues);
+            userOrderType.push(userOrderTyp);
           }
 
         }
@@ -646,7 +640,7 @@ export default {
             let userCat = await models.UserCategory.create({
               userId: user.id,
               userName: user.userName,
-              categoryId: cate.id,
+              // categoryId: cate.id,
               categoryName: cate.name
             });
             userCategory.push(userCat.dataValues);
@@ -654,6 +648,7 @@ export default {
 
         }
         await user.update(body);
+        
         return { user: user, categories: userCategory, orderTypes: userOrderType, success: true }
       },
     ),

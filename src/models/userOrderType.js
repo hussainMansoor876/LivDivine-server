@@ -1,5 +1,6 @@
+
 const userOrderType = (sequelize, DataTypes) => {
-  const { UUIDV4, STRING, UUID, BOOLEAN } = DataTypes
+  const { UUIDV4, STRING, UUID, BOOLEAN, FLOAT } = DataTypes
   const UserOrderType = sequelize.define('userOrderType', {
     id: {
       type: UUID,
@@ -14,14 +15,30 @@ const userOrderType = (sequelize, DataTypes) => {
         notEmpty: true,
       },
     },
-    orderTypeId: {
-      type: UUID,
+    subTitle: {
+      type: STRING,
       // unique: true,
       allowNull: false,
       validate: {
         notEmpty: true,
       },
     },
+    price: {
+      type: FLOAT,
+      // unique: true,
+      allowNull: false,
+      validate: {
+        notEmpty: true,
+      },
+    },
+    // orderTypeId: {
+    //   type: UUID,
+    //   // unique: true,
+    //   allowNull: false,
+    //   validate: {
+    //     notEmpty: true,
+    //   },
+    // },
     orderTypeName: {
       type: STRING,
       // unique: true,

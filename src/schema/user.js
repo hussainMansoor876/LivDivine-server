@@ -22,9 +22,20 @@ export default gql`
     updateUser(id: String!, userName: String, image: String, isLogin: Boolean, isOnline: Boolean, isAdvisor: Boolean, isApproved: Boolean): Token!
     updatePassword(id: String!,currentPassword: String, password: String!): Token!
     updateVerified(id: String!): Token!    
-    becomeAdvisor(id: String,authId: String, userName: String, title: String, image: String, videoThumbnail: String,
-      role: String, aboutService: String, aboutMe: String, isLogin: Boolean, isAdvisor: Boolean, isOnline: Boolean,
-      categories: [String], orderTypes: [String]): Token!
+    becomeAdvisor(id: String,authId: String,
+       userName: String,
+        title: String,
+         image: String,
+          videoThumbnail: String,
+          
+      role: String,
+       aboutService: String,
+        aboutMe: String,
+         isLogin: Boolean,
+          isAdvisor: Boolean, 
+          isOnline: Boolean,
+      categories: [String],
+       orderTypes: [UserOrderTs]): Token!
     deleteUser(id: ID!): Boolean!
   }
 
@@ -33,8 +44,8 @@ export default gql`
     user: User
     message: String
     success: Boolean!
-    categories: [Categories],
-    orderTypes: [OrderTypes]
+    categories: [UserCategories],
+    orderTypes: [UserOrderTypes]
   }
   type RoleUser {
     user: [User]
@@ -44,19 +55,24 @@ export default gql`
   type Messages {
     messages: String!
   }
-  type Categories {
+  type UserCategories {
     id: String    
     userId: String,
     userName: String,
-    categoryId: String,
     categoryName: String,
   }
-  type OrderTypes {
+  type UserOrderTypes {
     id: String    
     userId: String,
     userName: String,
-    OrderTypeId: String,
-    OrderTypeName: String,
+    orderTypeName: String,
+    subTitle: String
+    price: Float
+  }
+  input UserOrderTs {
+    orderTypeName: String,
+    subTitle: String
+    price: Float
   }
 
   type User {
@@ -78,7 +94,7 @@ export default gql`
     aboutService: String
     aboutMe: String
     videoThumbnail: String,
-    categories: [Categories]
-    orderTypes: [OrderTypes]
+    userCategories: [UserCategories]
+    userOrderTypes: [UserOrderTypes]
   }
 `;

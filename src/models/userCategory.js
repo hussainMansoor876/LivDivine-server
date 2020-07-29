@@ -14,14 +14,14 @@ const userCategory = (sequelize, DataTypes) => {
         notEmpty: true,
       },
     },
-    categoryId: {
-      type: UUID,
-      // unique: true,
-      allowNull: false,
-      validate: {
-        notEmpty: true,
-      },
-    },
+    // categoryId: {
+    //   type: UUID,
+    //   // unique: true,
+    //   allowNull: false,
+    //   validate: {
+    //     notEmpty: true,
+    //   },
+    // },
     categoryName: {
       type: STRING,
       // unique: true,
