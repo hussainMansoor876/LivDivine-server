@@ -15,27 +15,16 @@ export default gql`
       email: String!
       password: String
       isVerified: Boolean!
+      categories: String
     ): Token!
     socialSignUp(userName: String!, email: String, authType: String!, authId: String!, image: String ): Token!
     signIn(login: String!, password: String!): Token!
-    forgotPassword(id: String!, password: String!, otp: String!): Token!
-    updateUser(id: String!, userName: String, image: String, isLogin: Boolean, isOnline: Boolean, isAdvisor: Boolean, isApproved: Boolean): Token!
-    updatePassword(id: String!,currentPassword: String, password: String!): Token!
-    updateVerified(id: String!): Token!    
-    becomeAdvisor(id: String,authId: String,
-       userName: String,
-        title: String,
-         image: String,
-          videoThumbnail: String,
-          
-      role: String,
-       aboutService: String,
-        aboutMe: String,
-         isLogin: Boolean,
-          isAdvisor: Boolean, 
-          isOnline: Boolean,
-      categories: [String],
-       orderTypes: [UserOrderTs]): Token!
+    forgotPassword(email: String!, password: String!, otp: String!): Token!
+    updateUser(email: String!, userName: String, image: String, isLogin: Boolean, isOnline: Boolean, isAdvisor: Boolean): Token!
+    updatePassword(email: String!, password: String!): Token!
+    updateVerified(email: String!): Token!    
+    becomeAdvisor(email: String,authId: String, userName: String, title: String, image: String, 
+      role: String, aboutService: String, aboutMe: String, isLogin: Boolean, isAdvisor: Boolean, isOnline: Boolean): Token!
     deleteUser(id: ID!): Boolean!
   }
 
@@ -44,8 +33,6 @@ export default gql`
     user: User
     message: String
     success: Boolean!
-    categories: [UserCategories],
-    orderTypes: [UserOrderTypes]
   }
   type RoleUser {
     user: [User]
@@ -55,24 +42,8 @@ export default gql`
   type Messages {
     messages: String!
   }
-  type UserCategories {
-    id: String    
-    userId: String,
-    userName: String,
-    categoryName: String,
-  }
-  type UserOrderTypes {
-    id: String    
-    userId: String,
-    userName: String,
-    orderTypeName: String,
-    subTitle: String
-    price: Float
-  }
-  input UserOrderTs {
-    orderTypeName: String,
-    subTitle: String
-    price: Float
+  type Categories {
+    categories: String!
   }
 
   type User {
@@ -87,14 +58,11 @@ export default gql`
     isLogin: Boolean!
     isAdvisor: Boolean
     isOnline: Boolean
-    isApproved: Boolean
     authType: String
     title: String
     aimage: String
     aboutService: String
     aboutMe: String
-    videoThumbnail: String,
-    userCategories: [UserCategories]
-    userOrderTypes: [UserOrderTypes]
+    categories: String
   }
 `;

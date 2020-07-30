@@ -69,7 +69,7 @@ const sendVerificationEmail = (user) => {
 
       var mailOptions = {
         from: 'Office.seasolconsultancy@gmail.com',
-        to: 'waqasdemo222@gmail.com',
+        to: 'mansoorrajput888@gmail.com',
         // to: 'bonihe3478@entrastd.com',
         subject: 'Confirm Email',
         html: `Please click this email to confirm your email: <a href="${url}">${url}</a>`,
@@ -281,7 +281,7 @@ export default {
             isApproved: false,
             // categories: categories
           });
-          sendVerificationEmail(user);
+          // sendVerificationEmail(user);
           return { token: createToken(user, password, '30m'), user: user, success: true };
 
         } else {
@@ -301,7 +301,7 @@ export default {
           // categories: categories,
           role: "USER"
         });
-        sendVerificationEmail(user1);
+        // sendVerificationEmail(user1);
         return { token: createToken(user1, password, '30m'), user: user1, success: true };
 
       }
