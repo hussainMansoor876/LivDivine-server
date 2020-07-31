@@ -4,12 +4,20 @@ export default gql`
   extend type Query {
     userOrderTypes(cursor: String, limit: Int): UserOrderTypeConnection!
     getUserOrderTypeByUserId(userId: ID!): UserOrderTypeResultArray!
+    getUserByUserOrder(name: String!): UserOrderTypeResultArray!
     userOrderType(orderTypeId: ID!): UserOrderTypeResultArray!
   }
 
   extend type Mutation {
-    createUserOrderTypes(userId: String!, orderTypeId: String!): UserOrderTypeResult!
+    createUserOrderTypes(userId: String!, userOrderTypes: [UserOrderTypesss]!): UserOrderTypeResultArray!  
+    updateUserOrderTypes(userOrderTypes: [UserOrderTypesss]!): UserOrderTypeResultArray!
     deleteUserOrderType(id: ID!): Boolean!
+  }
+
+  input UserOrderTypesss {
+    id: String!
+    isActive: Boolean
+    price: Float
   }
 
   type UserOrderTypeConnection {
@@ -21,8 +29,9 @@ export default gql`
     userId: ID!
     userName: String!
     createdAt: Date!
-    orderTypeId: ID!
+    price: Float
     orderTypeName: String!
+    isActive: Boolean!
     user: User!
   }
   type UserOrderTypeResult {

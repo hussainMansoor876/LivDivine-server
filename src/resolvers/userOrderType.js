@@ -51,7 +51,7 @@ export default {
         console.log('userOrderTypes', userOrderTypes)
         return { result: userOrderTypes, success: true }
       } else {
-        
+
         console.log('NouserOrderTypes')
         return { message: 'No User OrderType Found', success: false }
       }
@@ -72,6 +72,23 @@ export default {
       } else {
         console.log('No User OrderType Found')
         return { message: 'No User OrderType Found', success: false }
+      }
+    },
+
+    getUserByUserOrder: async (parent, { name }, { models }) => {
+      // isMessageOwner,
+      // async (parent, { userId }, { models }) => {
+      console.log('user', name)
+      var userOrderType = await models.UserOrderType.findAll({
+        where: {
+          orderTypeName: name
+        },
+      });
+
+      if (userOrderType != "") {
+        return { result: userOrderType, success: true }
+      } else {
+        return { message: 'No User Order Type Found', success: false }
       }
     },
     // ),
@@ -115,6 +132,50 @@ export default {
 
     },
     // ),
+
+    updateUserOrderTypes: async (
+      //  combineResolvers(
+      // isAuthenticated,
+
+      parent,
+      body,
+      { models, me }) => {
+      const { userOrderTypes } = body
+      // var user = await models.User.findById(userId);
+      // var userOrderTyp = await models.UserOrderType.findAll({
+      //   where: {
+      //     userId: userId,
+      //   },
+      // });
+      // console.log("userOrderTyp", userOrderTyp)
+      // return {result: userOrderTyp}
+      // if (!userOrderTyp) {
+
+      //   return { message: "No User Order Type Found", success: false }
+      // } 
+      var newUserOrderTypes = []
+      for (let index in userOrderTypes) {
+        console.log('userOrderTypes[index].id', userOrderTypes[index].id)
+        var userOrderTyp = await models.UserOrderType.findById(userOrderTypes[index].id)
+        //   {
+        //   where: {
+        //     id: userOrderTypes[index].id,
+        //   },
+        // });
+
+        console.log("userOrderTyp", userOrderTyp)
+        if (!userOrderTyp) {
+          return { message: "No Order Type Found", success: false }
+        }
+        let newUserOrder = await userOrderTyp.update({
+          price: userOrderTypes[index].price,
+          isActive: userOrderTypes[index].isActive
+        });
+        newUserOrderTypes.push(newUserOrder.dataValues);
+      }
+      return { result: newUserOrderTypes, success: true }
+
+    },
 
     deleteUserOrderType: combineResolvers(
       // isAuthenticated,
