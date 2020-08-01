@@ -4,11 +4,13 @@ export default gql`
   extend type Query {
     userCategories(cursor: String, limit: Int): UserCategoryConnection!
     getUserCategoryByUserId(userId: ID!): UserCategoryResultArray!
-    userCategory(categoryId: ID!): UserCategoryResultArray!
+    getUserByUserCategory(name: String!): UserCategoryResultArray!
+    userCategorysss(userId: ID!): UserCategoryResultArray!
   }
 
   extend type Mutation {
-    createUserCategories(userId: String!, categoryId: String!): UserCategoryResult!
+    createUserCategories(userId: String!, userCategories: [String]!): UserCategoryResultArray!    
+    updateUserCategories(userId: String!, userCategories: [String]!): UserCategoryResultArray!
     deleteUserCategory(id: ID!): Boolean!
   }
 
@@ -21,9 +23,12 @@ export default gql`
     userId: ID!
     userName: String!
     createdAt: Date!
-    categoryId: ID!
     categoryName: String!
     user: User!
+  }
+
+  input UserCategorys {
+    categoryName: String!
   }
   type UserCategoryResult {
     result: UserCategory

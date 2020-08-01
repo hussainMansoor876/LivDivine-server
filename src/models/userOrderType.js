@@ -47,11 +47,19 @@ const userOrderType = (sequelize, DataTypes) => {
         notEmpty: true,
       },
     },
+    isActive: {
+      type: BOOLEAN,
+      // unique: true,
+      allowNull: false,
+      validate: {
+        notEmpty: true,
+      },
+    },
   });
 
   UserOrderType.associate = models => {
     UserOrderType.belongsTo(models.User);
-    UserOrderType.belongsTo(models.OrderType);
+    // UserOrderType.belongsTo(models.OrderType);
   };
 
   return UserOrderType;

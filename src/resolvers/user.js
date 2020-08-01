@@ -600,7 +600,8 @@ export default {
               userName: user.userName,
               subTitle: orderTypes[i].subTitle,
               price: orderTypes[i].price,
-              orderTypeName: orderTypes[i].orderTypeName
+              orderTypeName: orderTypes[i].orderTypeName,
+              isActive: orderTypes[i].isActive
             });
             userOrderType.push(userOrderTyp);
           }

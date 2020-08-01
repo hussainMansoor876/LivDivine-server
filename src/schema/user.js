@@ -68,10 +68,12 @@ export default gql`
     orderTypeName: String,
     subTitle: String
     price: Float
+    isActive: Boolean
   }
   input UserOrderTs {
     orderTypeName: String,
     subTitle: String
+    isActive: Boolean
     price: Float
   }
 
