@@ -7,7 +7,7 @@ sequelize : new Sequelize(
     process.env.DATABASE_PASSWORD,
     {
       dialect: 'postgres',
-      port: 5000,
+      port: 5432,
       host: "localhost",
     },
   );

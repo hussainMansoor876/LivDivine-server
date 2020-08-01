@@ -545,7 +545,6 @@ export default {
     ),
 
     updateVerified: combineResolvers(
-      // isAuthenticated,
       async (
         parent,
         { id, isVerified },
@@ -563,16 +562,10 @@ export default {
           }
           else {
             return { success: false, message: 'User is already verified! Please Login...' }
-            // throw new UserInputError(
-            //   'Email is already verified! Please Login...',
-            // );
           }
         }
         else {
           return { success: false, message: 'No user found.' }
-          // throw new UserInputError(
-          //   'No user found with this Email.',
-          // );
         }
 
       },
@@ -580,49 +573,31 @@ export default {
 
 
     becomeAdvisor: combineResolvers(
-      // isAuthenticated,
       async (
         parent,
         body,
         { models, me }) => {
         const { id, title, userName, image, role, aboutService, aboutMe, isLogin, isAdvisor, isOnline, videoThumbnail,
           categories, orderTypes } = body
-        // console.log('orderTypes', orderTypes)
         var newUser = await models.User.find({
           where: {
-            // $or: [
-            //   { email: email },
-            //   { authId: authId },
-            // ],
             id: body.id,
             isVerified: true
           },
         });
         if (!newUser) {
-          console.log("No User Found")
           return { message: 'No user found.', success: false }
-          // throw new UserInputError(
-          //   'No user found with this Email.',
-          // );
         }
-        console.log("else")
         const user = await models.User.findById(newUser.id);
-        // var userCat = "";
 
         var userOrderType = [];
         var userCategory = [];
 
         if (orderTypes) {
           for (var i in orderTypes) {
-            console.log('orderTypes', orderTypes[i])
-            // const orderTypessss = await models.OrderType.find({
-            //   where: { name: orderTypes[i] },
-            // });
-            // .findById(orderTypes[i]);
             let userOrderTyp = await models.UserOrderType.create({
               userId: user.id,
               userName: user.userName,
-              // orderTypeId: orderTypessss.id,
               subTitle: orderTypes[i].subTitle,
               price: orderTypes[i].price,
               orderTypeName: orderTypes[i].orderTypeName
@@ -633,15 +608,10 @@ export default {
         }
         if (categories) {
           for (var i in categories) {
-            const cate = await models.Category.find({
-              where: { name: categories[i] },
-            });
-            // .findById(categories[i]);
             let userCat = await models.UserCategory.create({
               userId: user.id,
               userName: user.userName,
-              // categoryId: cate.id,
-              categoryName: cate.name
+              categoryName: categories[i]
             });
             userCategory.push(userCat.dataValues);
           }
