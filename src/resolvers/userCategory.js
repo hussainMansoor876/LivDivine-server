@@ -41,17 +41,17 @@ export default {
         // },
       };
     },
-    userCategory: async (parent, { categoryId }, { models }) => {
+    userCategorysss: async (parent, { userId }, { models }) => {
       const userCategories = await models.UserCategory.findAll({
         where: {
-          categoryId: categoryId
+          userId: userId
         }
       });
       if (userCategories != "") {
         console.log('userCategories', userCategories)
         return { result: userCategories, success: true }
       } else {
-        
+
         console.log('NouserCategories')
         return { message: 'No User Category Found', success: false }
       }
@@ -74,6 +74,23 @@ export default {
         return { message: 'No User Category Found', success: false }
       }
     },
+
+    getUserByUserCategory: async (parent, { name }, { models }) => {
+      // isMessageOwner,
+      // async (parent, { userId }, { models }) => {
+      console.log('user', name)
+      var userCategory = await models.UserCategory.findAll({
+        where: {
+          categoryName: name
+        },
+      });
+
+      if (userCategory != "") {
+        return { result: userCategory, success: true }
+      } else {
+        return { message: 'No User Category Found', success: false }
+      }
+    },
     // ),
   },
 
@@ -85,16 +102,8 @@ export default {
       parent,
       body,
       { models, me }) => {
-      const { categoryId, userId } = body
+      const { userCategories, userId } = body
 
-      console.log('body', body)
-      var category = await models.Category.findById(categoryId);
-      if (category) {
-        console.log('category', category)
-      } else {
-        console.log("No category")
-        return { message: 'No category', success: false }
-      }
       var user = await models.User.findById(userId);
       if (user) {
         console.log('user', userId)
@@ -102,19 +111,57 @@ export default {
         console.log("No user")
         return { message: 'No User', success: false }
       }
-      const userCategory = await models.UserCategory.create({
-        userId,
-        userName: user.userName,
-        categoryId,
-        categoryName: category.name
-      });
+
+      let userCategory = []
+      if (userCategories) {
+        for (var i in userCategories) {
+          let userCat = await models.UserCategory.create({
+            userId: user.id,
+            userName: user.userName,
+            categoryName: userCategories[i]
+          });
+          userCategory.push(userCat.dataValues);
+        }
+      }
       return { result: userCategory, success: true }
-      // pubsub.publish(EVENTS.USERCATEGORY.CREATED, {
-      //   usercategoryCreated: { usercategory },
-      // });
+    },
+
+    updateUserCategories: async (
+      //  combineResolvers(
+      // isAuthenticated,
+
+      parent,
+      body,
+      { models, me }) => {
+      const { userId, userCategories } = body
+      console.log("userCategories", userCategories)
+      var user = await models.User.findById(userId);
+      var userCat = await models.UserCategory.findAll({
+        where: {
+          userId: userId,
+        },
+      });
+      if (!userCat) {
+
+        return { message: "No Category Found", success: false }
+      } else {
+        for (var i in userCat) {
+          await models.UserCategory.destroy({ where: { id: userCat[i].id } });
+        }
+      }
+
+      var newUserCategorys = []
+      for (let index in userCategories) {
+        let newUserCat = await models.UserCategory.create({
+          userId: user.id,
+          userName: user.userName,
+          categoryName: userCategories[index]
+        });
+        newUserCategorys.push(newUserCat.dataValues);
+      }
+      return { result: newUserCategorys, success: true }
 
     },
-    // ),
 
     deleteUserCategory: combineResolvers(
       // isAuthenticated,

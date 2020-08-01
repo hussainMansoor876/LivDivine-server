@@ -14,14 +14,7 @@ const userCategory = (sequelize, DataTypes) => {
         notEmpty: true,
       },
     },
-    // categoryId: {
-    //   type: UUID,
-    //   // unique: true,
-    //   allowNull: false,
-    //   validate: {
-    //     notEmpty: true,
-    //   },
-    // },
+
     categoryName: {
       type: STRING,
       // unique: true,
@@ -34,7 +27,7 @@ const userCategory = (sequelize, DataTypes) => {
 
   UserCategory.associate = models => {
     UserCategory.belongsTo(models.User);
-    UserCategory.belongsTo(models.Category);
+    // UserCategory.belongsTo(models.Category);
   };
 
   return UserCategory;

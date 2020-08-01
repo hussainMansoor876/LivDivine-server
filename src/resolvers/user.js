@@ -625,7 +625,8 @@ export default {
               // orderTypeId: orderTypessss.id,
               subTitle: orderTypes[i].subTitle,
               price: orderTypes[i].price,
-              orderTypeName: orderTypes[i].orderTypeName
+              orderTypeName: orderTypes[i].orderTypeName,
+              isActive: orderTypes[i].isActive
             });
             userOrderType.push(userOrderTyp);
           }
@@ -633,15 +634,10 @@ export default {
         }
         if (categories) {
           for (var i in categories) {
-            const cate = await models.Category.find({
-              where: { name: categories[i] },
-            });
-            // .findById(categories[i]);
             let userCat = await models.UserCategory.create({
               userId: user.id,
               userName: user.userName,
-              // categoryId: cate.id,
-              categoryName: cate.name
+              categoryName: categories[i]
             });
             userCategory.push(userCat.dataValues);
           }
