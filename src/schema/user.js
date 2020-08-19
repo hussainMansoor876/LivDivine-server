@@ -5,7 +5,9 @@ export default gql`
     users: [User!]
     searchUsers(userName: String!, role: String, isOnline: Boolean, isAdvisor: Boolean): RoleUser!
     user(id: ID!): User    
-    getAllUserByRole(role: String!): RoleUser!
+    getAllAdvisorForUser: RoleUser!
+    getAllAdvisorForAdmin(userId: String!, isApproved: Boolean!): RoleUser!    
+    getAllAdvisor(categoryName: String,  orderTypeName: String, advisorName: String): AdvisorResultArray!
     me: User
   }
 
@@ -24,18 +26,18 @@ export default gql`
     updateVerified(id: String!): Token!    
     becomeAdvisor(id: String,authId: String,
        userName: String,
-        title: String,
-         image: String,
-          videoThumbnail: String,
-          
-      role: String,
+       title: String,
+       image: String,
+       videoThumbnail: String,          
+       role: String,
        aboutService: String,
-        aboutMe: String,
-         isLogin: Boolean,
-          isAdvisor: Boolean, 
-          isOnline: Boolean,
-      categories: [String],
+       aboutMe: String,
+       isLogin: Boolean,
+       isAdvisor: Boolean, 
+       isOnline: Boolean,
+       categories: [String],
        orderTypes: [UserOrderTs]): Token!
+    approvedAdvisor(userId: String!, adminId: String!, status: Boolean!): Token!
     deleteUser(id: ID!): Boolean!
   }
 
@@ -44,8 +46,24 @@ export default gql`
     user: User
     message: String
     success: Boolean!
-    categories: [UserCategories],
+    categories: [UserCategories]
     orderTypes: [UserOrderTypes]
+  }
+  type AdvisorResultArray {
+    user: [User]  
+    categories: [UserCategories]
+    orderTypes: [UserOrderTypes]
+    success: Boolean
+    message: String
+  }
+  type AdvisorDetails {
+    id: ID
+    userId: ID
+    userName: String
+    createdAt: Date
+    categoryName: String
+    orderTypeName: String  
+    user: [User]
   }
   type RoleUser {
     user: [User]
@@ -96,7 +114,7 @@ export default gql`
     aboutService: String
     aboutMe: String
     videoThumbnail: String,
-    userCategories: [UserCategories]
-    userOrderTypes: [UserOrderTypes]
+    categories: [UserCategories]
+    orderTypes: [UserOrderTypes]
   }
 `;

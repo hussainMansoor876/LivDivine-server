@@ -78,7 +78,7 @@ export default {
     getUserByUserCategory: async (parent, { name }, { models }) => {
       // isMessageOwner,
       // async (parent, { userId }, { models }) => {
-      console.log('user', name)
+      // console.log('user', name)
       var userCategory = await models.UserCategory.findAll({
         where: {
           categoryName: name
@@ -86,6 +86,7 @@ export default {
       });
 
       if (userCategory != "") {
+        // console.log('userCategory', userCategory)
         return { result: userCategory, success: true }
       } else {
         return { message: 'No User Category Found', success: false }

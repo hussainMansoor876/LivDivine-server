@@ -7,7 +7,8 @@ import { isAdmin, isAuthenticated } from './authorization';
 import { condition } from 'sequelize';
 const { Op } = require("sequelize");
 import _ from 'lodash';
-import userCategory from '../schema/userCategory';
+// import userCategory from '../schema/userCategory';
+import userCat from '../models/index';
 
 
 const EMAIL_SECRET = 'asdf1093KMnzxcvnkljvasdu09123nlasdasdf';
@@ -97,7 +98,7 @@ const sendVerificationEmail = (user) => {
   // });
 }
 
-let getUserCategories = async (id) => {
+let getUserCategoriess = async (id) => {
   // const { id } = user;
   var userCategory = await models.UserCategory.findAll({
     where: {
@@ -106,10 +107,82 @@ let getUserCategories = async (id) => {
   });
 
   if (userCategory != "") {
-    console.log('userCategory', userCategory)
     return await userCategory;
   }
 };
+
+
+
+let getUserByCategoryName = async (categoryName) => {
+
+  var userCategory = await userCat.UserCategory.findAll({
+    where: {
+      categoryName: categoryName
+    },
+  });
+  // console.log('userCategory', userCategory)
+  if (userCategory) {
+    let userss = [];
+    for (var i in userCategory) {
+
+      let user = await userCat.User.find({
+        where: {
+          id: userCategory[i].userId,
+          role: 'ADVISOR', isApproved: false,
+        },
+      })
+      userss.push(user);
+    }
+    return userss;
+  } else {
+    return { message: 'No Advisor Found', success: false };
+  }
+};
+
+
+let getUserByorderTypeName = async (orderTypeName) => {
+
+  var orderType = await userCat.UserOrderType.findAll({
+    where: {
+      orderTypeName: orderTypeName
+    },
+  });
+  if (orderType) {
+    let userss = [];
+    for (var i in orderType) {
+
+      let user = await userCat.User.find({
+        where: {
+          id: orderType[i].userId,
+          role: 'ADVISOR', isApproved: false,
+        },
+      })
+
+      userss.push(user);
+    }
+    console.log('userss', userss.length)
+    return userss;
+  } else {
+    return null;
+  }
+};
+
+let getUserByAdvisorName = async (advisorName) => {
+
+  let user = await userCat.User.findAll({
+    where: {
+      userName: {
+        [Op.iRegexp]: advisorName
+      },
+      role: 'ADVISOR', isApproved: false,
+    },
+  })
+  console.log('user', user.length)
+  return user;
+};
+
+
+
 
 let getUserOrderType = async (id) => {
   // const { id } = user;
@@ -120,10 +193,51 @@ let getUserOrderType = async (id) => {
   });
 
   if (userOrderType != "") {
-    console.log('UserOrderType', userOrderType)
     return userOrderType;
   }
 };
+
+function check_duplicates(a, b) {
+  var newUserResult = []
+  for (var i = 0, len = a.length; i < len; i++) {
+    for (var j = 0, len2 = b.length; j < len2; j++) {
+      if (a[i].id === b[j].id) {
+              /* b.splice(j, 1) */;
+        newUserResult.push(b[j]);
+        // console.log('a.length && b.length', a.length, b.length);
+        // console.log('newUserResult', newUserResult.length);
+        // len2 = b.length;
+      }
+    }
+  }
+  console.log('newUserResult', newUserResult.length);
+  return newUserResult;
+
+}
+
+function checkThree_duplicates(a, b, c) {
+  // console.log('a, b, c', a.length, b.length, c.length)
+  var asd = []; var newUserResult = []
+  for (var i = 0, len = a.length; i < len; i++) {
+    for (var j = 0, len2 = b.length; j < len2; j++) {
+      if (a[i].id === b[j].id) {
+        asd.push(b[j]);
+      }
+
+    }
+  }
+  for (var k = 0, len3 = c.length; k < len3; k++) {
+    // console.log('a, b, c', a.length, b.length, c.length)
+    for (var l = 0, len4 = asd.length; l < len4; l++) {
+      if (asd[l].id === c[k].id) {
+        newUserResult.push(c[k]);
+      }
+    }
+  }
+  // console.log('asd', asd.length);
+  // console.log('newUserResult', newUserResult.length);
+  return newUserResult;
+}
 
 
 export default {
@@ -229,18 +343,172 @@ export default {
     user: async (parent, { id }, { models }) => {
       return await models.User.findById(id);
     },
-    getAllUserByRole: async (parent, { role }, { models }) => {
+    getAllAdvisorForUser: async (parent, { }, { models }) => {
       var user = await models.User.findAll({
         where: {
-          role: role
+          role: 'ADVISOR',
+          isApproved: true
         }
+
       });
-      if (user) {
-        console.log('users', user);
+      if (user.length > 0) {
+
         return { user: user, success: true }
       } else {
-        console.log('No User Found')
         return { message: 'No User Found', success: false }
+      }
+    },
+    getAllAdvisorForAdmin: async (parent, { userId, isApproved }, { models }) => {
+      var admin = await models.User.findById(userId);
+      if (admin.role == 'ADMIN') {
+        var user = await models.User.findAll({
+          where: {
+            role: 'ADVISOR',
+            isApproved: isApproved
+          }
+        });
+        if (user.length > 0) {
+          return { user: user, success: true }
+        } else {
+          return { message: 'No User Found', success: false }
+        }
+      } else {
+        return { message: 'No Admin Found', success: false }
+      }
+    },
+
+    getAllAdvisor: async (parent, { categoryName, orderTypeName, advisorName }, { models }) => {
+      console.log('categoryName, orderTypeName', categoryName, orderTypeName)
+      if (categoryName != null && orderTypeName == null && advisorName == null) {
+        // var userCategory = await models.UserCategory.findAll({
+        //   where: {
+        //     categoryName: categoryName
+        //   },
+        // });
+        // console.log('userCategory', userCategory)
+        // if (userCategory) {
+        //   let userss = [];
+        //   for (var i in userCategory) {
+
+        //     let user = await models.User.find({
+        //       where: {
+        //         id: userCategory[i].userId,
+        //         role: 'ADVISOR', isApproved: false,
+        //       },
+        //     })
+        //     userss.push(user);
+        //   }
+        //   return { user: userss, success: true }
+        // }
+        const user = await getUserByCategoryName(categoryName);
+        if (user.length > 0) {
+          return { user: user, success: true }
+
+        } else {
+          return { message: "No Advisor Found", success: false }
+        }
+      } else if (orderTypeName != null && categoryName == null && advisorName == null) {
+        console.log('this should run')
+
+        // var orderType = await models.UserOrderType.findAll({
+        //   where: {
+        //     orderTypeName: orderTypeName
+        //   },
+        // });
+        // if (orderType) {
+        //   let userss = [];
+        //   for (var i in orderType) {
+
+        //     let user = await models.User.find({
+        //       where: {
+        //         id: orderType[i].userId,
+        //         role: 'ADVISOR', isApproved: false,
+        //       },
+        //     })
+        //     userss.push(user);
+        //   }
+        //   return { user: userss, success: true }
+        // }  
+        const user = await getUserByorderTypeName(orderTypeName)
+
+        if (user.length > 0) {
+          return { user: user, success: true }
+
+        } else {
+          return { message: "No Advisor Found", success: false }
+        }
+        // return { user: user, success: true };
+      } else if (advisorName != null && categoryName == null && orderTypeName == null) {
+        // let user = await models.User.findAll({
+        //   where: {
+        //     userName: {
+        //       [Op.iRegexp]: advisorName
+        //     },
+        //     role: 'ADVISOR', isApproved: false,
+        //   },
+        // })
+        // return { user: user, success: true }
+
+        const user = await getUserByAdvisorName(advisorName)
+        if (user.length > 0) {
+          return { user: user, success: true }
+
+        } else {
+          return { message: "No Advisor Found", success: false }
+        }
+        // return { user: user, success: true };
+      } else if (categoryName != null && advisorName != null && orderTypeName == null) {
+        console.log("categoryName && advisorName && orderTypeName", categoryName && advisorName && orderTypeName)
+
+        const categoryUsers = await getUserByCategoryName(categoryName);
+        const adUser = await getUserByAdvisorName(advisorName);
+
+        var user = await check_duplicates(categoryUsers, adUser);
+        if (user.length > 0) {
+          return { user: user, success: true }
+
+        } else {
+          return { message: "No Advisor Found", success: false }
+        }
+      } else if (orderTypeName != null && advisorName != null && categoryName == null) {
+        console.log("categoryName && advisorName && orderTypeName", categoryName && advisorName && orderTypeName)
+
+        const orderTypeUsers = await getUserByorderTypeName(orderTypeName);
+        const adUser = await getUserByAdvisorName(advisorName);
+        var user = await check_duplicates(orderTypeUsers, adUser);
+        if (user.length > 0) {
+          return { user: user, success: true }
+
+        } else {
+          return { message: "No Advisor Found", success: false }
+        }
+      } else if (orderTypeName != null && categoryName != null && advisorName == null) {
+        console.log("categoryName && advisorName && orderTypeName", categoryName && advisorName && orderTypeName)
+
+        const categoryUsers = await getUserByCategoryName(categoryName);
+        const orderTypeUsers = await getUserByorderTypeName(orderTypeName);
+
+        var user = await check_duplicates(categoryUsers, orderTypeUsers);
+        if (user.length > 0) {
+          return { user: user, success: true }
+
+        } else {
+          return { message: "No Advisor Found", success: false }
+        }
+      } else {
+        console.log('else')
+        console.log("categoryName && advisorName && orderTypeName", categoryName && advisorName && orderTypeName)
+
+        const categoryUsers = await getUserByCategoryName(categoryName);
+        const orderTypeUsers = await getUserByorderTypeName(orderTypeName);
+        const adUser = await getUserByAdvisorName(advisorName);
+        var user = await checkThree_duplicates(categoryUsers, orderTypeUsers, adUser);
+        if (user.length > 0) {
+          return { user: user, success: true }
+
+        } else {
+          return { message: "No Advisor Found", success: false }
+        }
       }
     },
     me: async (parent, args, { models, me }) => {
@@ -619,8 +887,80 @@ export default {
 
         }
         await user.update(body);
-        
+
         return { user: user, categories: userCategory, orderTypes: userOrderType, success: true }
+      },
+    ),
+
+    approvedAdvisor: combineResolvers(
+      // isAuthenticated,
+      async (
+        parent,
+        { userId, adminId, status },
+        { models, me }) => {
+        var adminUser = await models.User.find({
+          where: {
+            id: adminId,
+          },
+        });
+        console.log('adminUser', adminUser)
+        if (adminUser.role == 'ADMIN') {
+          // return { success: true, message: 'User is Admin' }
+          var newUser = await models.User.find({
+            where: {
+              id: userId,
+            },
+          });
+          if (newUser) {
+            if (newUser.isApproved === false) {
+              const user = await models.User.findById(newUser.id);
+              if (status == true) {
+                await user.update({ isApproved: true });
+                return { user: user, success: true }
+              } else {
+                await user.update({
+                  videoThumbnail: null,
+                  role: 'USER',
+                  aboutService: null,
+                  aboutMe: null,
+                  isAdvisor: false,
+                  categories: null,
+                  orderTypes: null,
+                  title: null,
+                  isApproved: false
+                });
+                var userCat = await models.UserCategory.findAll({
+                  where: {
+                    userId: userId,
+                  },
+                });
+                var userOrder = await models.UserOrderType.findAll({
+                  where: {
+                    userId: userId,
+                  },
+                });
+                for (var i in userCat) {
+                  await models.UserCategory.destroy({ where: { id: userCat[i].id } });
+                }
+                for (var i in userOrder) {
+                  await models.UserOrderType.destroy({ where: { id: userOrder[i].id } });
+                }
+                return { user: user, success: true }
+              }
+            }
+            else {
+              return { success: false, message: 'User is already isApproved! Please Login...' }
+            }
+          }
+          else {
+            return { success: false, message: 'No user found.' }
+          }
+
+        } else {
+          return { success: false, message: 'User is Not Admin' }
+        }
+
+
       },
     ),
 
