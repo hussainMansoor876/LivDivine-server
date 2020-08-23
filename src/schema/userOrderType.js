@@ -10,12 +10,14 @@ export default gql`
 
   extend type Mutation {
     createUserOrderTypes(userId: String!, userOrderTypes: [UserOrderTypesss]!): UserOrderTypeResultArray!  
-    updateUserOrderTypes(userOrderTypes: [UserOrderTypesss]!): UserOrderTypeResultArray!
+    updateUserOrderTypes(userId: String!, userOrderTypes: [UserOrderTypesss]!): UserOrderTypeResultArray!
     deleteUserOrderType(id: ID!): Boolean!
   }
 
   input UserOrderTypesss {
-    id: String!
+    id: String
+    name: String
+    subTitle: String
     isActive: Boolean
     price: Float
   }
