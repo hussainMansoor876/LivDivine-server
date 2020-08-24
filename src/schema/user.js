@@ -28,7 +28,7 @@ export default gql`
        userName: String,
        title: String,
        image: String,
-       videoThumbnail: String,          
+       video: String,          
        role: String,
        aboutService: String,
        aboutMe: String,
@@ -113,7 +113,7 @@ export default gql`
     aimage: String
     aboutService: String
     aboutMe: String
-    videoThumbnail: String,
+    video: String,
     categories: [UserCategories]
     orderTypes: [UserOrderTypes]
   }

@@ -845,7 +845,7 @@ export default {
         parent,
         body,
         { models, me }) => {
-        const { id, title, userName, image, role, aboutService, aboutMe, isLogin, isAdvisor, isOnline, videoThumbnail,
+        const { id, title, userName, image, role, aboutService, aboutMe, isLogin, isAdvisor, isOnline, video,
           categories, orderTypes } = body
         var newUser = await models.User.find({
           where: {
@@ -919,7 +919,7 @@ export default {
                 return { user: user, success: true }
               } else {
                 await user.update({
-                  videoThumbnail: null,
+                  video: null,
                   role: 'USER',
                   aboutService: null,
                   aboutMe: null,
