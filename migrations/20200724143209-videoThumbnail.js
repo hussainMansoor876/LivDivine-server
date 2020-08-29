@@ -5,7 +5,7 @@ module.exports = {
     const { STRING } = Sequelize
     await queryInterface.addColumn(
       'users',
-      'videoThumbnail',
+      'video',
       {
         type: STRING,
       }

@@ -9,6 +9,8 @@ const { Op } = require("sequelize");
 import _ from 'lodash';
 // import userCategory from '../schema/userCategory';
 import userCat from '../models/index';
+import userCategory from './userCategory';
+import userOrderType from './userOrderType';
 
 
 const EMAIL_SECRET = 'asdf1093KMnzxcvnkljvasdu09123nlasdasdf';
@@ -114,7 +116,6 @@ let getUserCategoriess = async (id) => {
 
 
 let getUserByCategoryName = async (categoryName) => {
-
   var userCategory = await userCat.UserCategory.findAll({
     where: {
       categoryName: categoryName
@@ -128,7 +129,7 @@ let getUserByCategoryName = async (categoryName) => {
       let user = await userCat.User.find({
         where: {
           id: userCategory[i].userId,
-          role: 'ADVISOR', isApproved: false,
+          role: 'ADVISOR', isApproved: true,
         },
       })
       userss.push(user);
@@ -154,7 +155,7 @@ let getUserByorderTypeName = async (orderTypeName) => {
       let user = await userCat.User.find({
         where: {
           id: orderType[i].userId,
-          role: 'ADVISOR', isApproved: false,
+          role: 'ADVISOR', isApproved: true,
         },
       })
 
@@ -174,7 +175,7 @@ let getUserByAdvisorName = async (advisorName) => {
       userName: {
         [Op.iRegexp]: advisorName
       },
-      role: 'ADVISOR', isApproved: false,
+      role: 'ADVISOR', isApproved: true,
     },
   })
   console.log('user', user.length)
@@ -239,6 +240,27 @@ function checkThree_duplicates(a, b, c) {
   return newUserResult;
 }
 
+let getCategorybyUser = async (userId) => {
+  console.log('id', userId)
+  var userCategory = await userCat.UserCategory.findAll({
+    where: {
+      userId: userId
+    },
+  });
+
+  // console.log('userCat', userCategory)
+  return userCategory
+
+}
+let getOrderTypebyUser = async (userId) => {
+  var userOrderType = await userCat.UserOrderType.findAll({
+    where: {
+      userId: userId
+    },
+  });
+  // console.log('userOrder', userOrderType)
+  return userOrderType
+}
 
 export default {
   Query: {
@@ -251,10 +273,12 @@ export default {
     //   { models, secret },
     // ) => {
     searchUsers: async (parent, { userName, role, isOnline, isAdvisor }, { models }) => {
-      let user = "";
+      let user = [];
+      var userCategory = [];
+      var userOrderType = [];
       if (role && isOnline && isAdvisor) {
         console.log('role && isOnline && isAdvisor', role, isOnline, isAdvisor)
-        user = models.User.findAll({
+        user = await models.User.findAll({
           where: {
             userName: {
               [Op.iRegexp]: userName
@@ -263,40 +287,77 @@ export default {
             // isApproved: true,
           },
         })
-        return { user: user, success: true };
+        if (user.length > 0) {
+          for (var i in user) {
+
+            userCategory = await getCategorybyUser(user[i].id)
+            userOrderType = await getOrderTypebyUser(user[i].id)
+            user[i].categories = userCategory
+            user[i].orderTypes = userOrderType
+
+          }
+          return { user: user, success: true };
+        } else {
+          return { message: 'No User', success: false }
+        }
       }
       else if (role && isOnline == true) {
 
         console.log('role && isOnline', role, isOnline)
-        user = models.User.findAll({
+        user = await models.User.findAll({
           where: {
             userName: {
               [Op.iRegexp]: userName
             },
-            role: role, isOnline: isOnline, isAdvisor: false,
+            role: role, isOnline: isOnline,
             isApproved: true,
           },
         })
 
-        return { user: user, success: true };
+        if (user.length > 0) {
+          for (var i in user) {
+
+            userCategory = await getCategorybyUser(user[i].id)
+            userOrderType = await getOrderTypebyUser(user[i].id)
+            user[i].categories = userCategory
+            user[i].orderTypes = userOrderType
+
+          }
+          return { user: user, success: true };
+        } else {
+          return { message: 'No User', success: false }
+        }
       }
       else if (role && isAdvisor == true) {
         console.log('role && isAdvisor', role, isAdvisor)
-        user = models.User.findAll({
+        user = await models.User.findAll({
           where: {
             userName: {
               [Op.iRegexp]: userName
             },
-            role: role, isAdvisor: isAdvisor, isOnline: false,
+            role: role, isAdvisor: isAdvisor,
             isApproved: true,
           },
         })
+        if (user.length > 0) {
 
-        return { user: user, success: true };
+
+          for (var i in user) {
+
+            userCategory = await getCategorybyUser(user[i].id)
+            userOrderType = await getOrderTypebyUser(user[i].id)
+            user[i].categories = userCategory
+            user[i].orderTypes = userOrderType
+
+          }
+          return { user: user, success: true };
+        } else {
+          return { message: 'No User', success: false }
+        }
       }
       else if (role && isOnline == false && isAdvisor == false) {
         console.log('role && isOnline == false && isAdvisor == false', role, isOnline, isAdvisor)
-        user = models.User.findAll({
+        user = await models.User.findAll({
           where: {
             userName: {
               [Op.iRegexp]: userName
@@ -305,70 +366,147 @@ export default {
             isApproved: true,
           },
         })
-        return { user: user, success: true };
+        if (user.length > 0) {
+
+
+          for (var i in user) {
+
+            userCategory = await getCategorybyUser(user[i].id)
+            userOrderType = await getOrderTypebyUser(user[i].id)
+            user[i].categories = userCategory
+            user[i].orderTypes = userOrderType
+
+          }
+          return { user: user, success: true };
+        } else {
+          return { message: 'No User', success: false }
+        }
 
       }
       else if (role) {
         console.log('role', role)
-        user = models.User.findAll({
-          where: {
-            userName: {
-              [Op.iRegexp]: userName
+        if (!isOnline) {
+          user = await models.User.findAll({
+            where: {
+              userName: {
+                [Op.iRegexp]: userName
+              },
+              role: role, isOnline: false, isApproved: true,
             },
-            role: role,
-            isApproved: true,
-          },
-        })
-        return { user: user, success: true };
+          })
+        } else if (!isAdvisor) {
+          user = await models.User.findAll({
+            where: {
+              userName: {
+                [Op.iRegexp]: userName
+              },
+              role: role, isAdvisor: false, isApproved: true,
+            },
+          })
+        }
+
+        if (user.length > 0) {
+
+
+          for (var i in user) {
+
+            userCategory = await getCategorybyUser(user[i].id)
+            userOrderType = await getOrderTypebyUser(user[i].id)
+            user[i].categories = userCategory
+            user[i].orderTypes = userOrderType
+
+          }
+          return { user: user, success: true };
+        } else {
+          return { message: 'No User', success: false }
+        }
 
       } else {
         console.log('else')
-        user = models.User.findAll({
+        user = await models.User.findAll({
           where: {
             userName: {
               [Op.iRegexp]: userName
             },
-            isApproved: true,
+            // isApproved: true,
           },
         })
+        if (user.length > 0) {
+
+
+          for (var i in user) {
+
+            userCategory = await getCategorybyUser(user[i].id)
+            userOrderType = await getOrderTypebyUser(user[i].id)
+            user[i].categories = userCategory
+            user[i].orderTypes = userOrderType
+
+          }
+
+          return { user: user, success: true };
+
+        } else {
+          return { message: 'No User', success: false }
+        }
       }
       // let searchFor = body.userName
-      if (user != "") {
-        return { user: user, success: true };
 
-      } else {
-        return { message: 'No User', success: false }
-      }
     },
     user: async (parent, { id }, { models }) => {
       return await models.User.findById(id);
     },
     getAllAdvisorForUser: async (parent, { }, { models }) => {
-      var user = await models.User.findAll({
+      var user = [];
+      let userCategory = [];
+      let userOrderType = [];
+      user = await models.User.findAll({
         where: {
           role: 'ADVISOR',
           isApproved: true
         }
 
       });
-      if (user.length > 0) {
 
-        return { user: user, success: true }
+      if (user.length > 0) {
+        for (var i in user) {
+
+          userCategory = await getCategorybyUser(user[i].id)
+          userOrderType = await getOrderTypebyUser(user[i].id)
+          user[i].categories = userCategory
+          user[i].orderTypes = userOrderType
+
+        }
+        return { user: user, success: true };
       } else {
         return { message: 'No User Found', success: false }
       }
     },
     getAllAdvisorForAdmin: async (parent, { userId, isApproved }, { models }) => {
-      var admin = await models.User.findById(userId);
-      if (admin.role == 'ADMIN') {
-        var user = await models.User.findAll({
+      var user = [];
+      let userCategory = [];
+      let userOrderType = [];
+      var admin = await models.User.find({
+        where: {
+          id: userId, role: 'ADMIN'
+        }
+      });
+      if (admin) {
+        user = await models.User.findAll({
           where: {
             role: 'ADVISOR',
             isApproved: isApproved
           }
         });
         if (user.length > 0) {
-          return { user: user, success: true }
+          for (var i in user) {
+
+            userCategory = await getCategorybyUser(user[i].id)
+            userOrderType = await getOrderTypebyUser(user[i].id)
+            user[i].categories = userCategory
+            user[i].orderTypes = userOrderType
+
+          }
+          return { user: user, success: true };
         } else {
           return { message: 'No User Found', success: false }
         }
@@ -732,11 +870,15 @@ export default {
         return { success: false, message: 'Invalid password.' }
         // throw new AuthenticationError('Invalid password.');
       }
-      await user.update({
+      var usersss = await user.update({
         isLogin: true,
         isOnline: true,
       });
-
+      var userCategory = await getCategorybyUser(user.id)
+      var userOrderType = await getOrderTypebyUser(user.id)
+      // console.log('userCat, userOrder', userCategory, userOrderType)
+      user.categories = userCategory
+      user.orderTypes = userOrderType
       return { token: createToken(user, password, '30m'), user: user, success: true };
     },
 
@@ -760,6 +902,11 @@ export default {
         }
         const user = await models.User.findById(newUser.id);
         await user.update(body);
+        var userCategory = await getCategorybyUser(user.id)
+        var userOrderType = await getOrderTypebyUser(user.id)
+        // console.log('userCat, userOrder', userCategory, userOrderType)
+        user.categories = userCategory
+        user.orderTypes = userOrderType
         return { user: user, success: true }
       },
     ),
@@ -789,6 +936,11 @@ export default {
 
           password = await bcrypt.hash(pass, saltRounds);
           await newUser.update({ password });
+          var userCategory = await getCategorybyUser(newUser.id)
+          var userOrderType = await getOrderTypebyUser(newUser.id)
+          // console.log('userCat, userOrder', userCategory, userOrderType)
+          newUser.categories = userCategory
+          newUser.orderTypes = userOrderType
           return { user: newUser, success: true }
         } else {
           return { success: false, message: 'No user found' }
@@ -827,6 +979,11 @@ export default {
           if (newUser.isVerified === false) {
             const user = await models.User.findById(newUser.id);
             await user.update({ isVerified: true });
+            var userCategory = await getCategorybyUser(user.id)
+            var userOrderType = await getOrderTypebyUser(user.id)
+            // console.log('userCat, userOrder', userCategory, userOrderType)
+            user.categories = userCategory
+            user.orderTypes = userOrderType
             return { user: user, success: true }
           }
           else {
@@ -853,7 +1010,7 @@ export default {
         parent,
         body,
         { models, me }) => {
-        const { id, title, userName, image, role, aboutService, aboutMe, isLogin, isAdvisor, isOnline, videoThumbnail,
+        const { id, title, userName, image, role, aboutService, aboutMe, isLogin, isAdvisor, isOnline, video,
           categories, orderTypes } = body
         // console.log('orderTypes', orderTypes)
         var newUser = await models.User.find({
@@ -941,10 +1098,15 @@ export default {
               const user = await models.User.findById(newUser.id);
               if (status == true) {
                 await user.update({ isApproved: true });
+                var userCategory = await getCategorybyUser(user.id)
+                var userOrderType = await getOrderTypebyUser(user.id)
+                // console.log('userCat, userOrder', userCategory, userOrderType)
+                user.categories = userCategory
+                user.orderTypes = userOrderType
                 return { user: user, success: true }
               } else {
                 await user.update({
-                  videoThumbnail: null,
+                  video: null,
                   role: 'USER',
                   aboutService: null,
                   aboutMe: null,

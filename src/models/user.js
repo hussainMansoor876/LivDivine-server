@@ -42,7 +42,7 @@ const user = (sequelize, DataTypes) => {
     image: {
       type: STRING,
     },
-    videoThumbnail: {
+    video: {
       type: STRING,
     },
     isVerified: {
