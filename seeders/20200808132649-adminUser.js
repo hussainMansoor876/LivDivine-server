@@ -7,7 +7,7 @@ module.exports = {
       id: uuidv4(),
       userName: 'admin',
       email: 'admin@gmail.com',
-      password: '$2a$10$X4WUW1Er.Yl4o.j3XuNlge6xLlx.DEuDdsykRU9D769FP0PURBNhm',
+      password: '$2a$10$4GpFqIQG0SwFOHrFAJscV.FTVuew6SkBw5uiZrzlidNk773wVWQPu',
       role: 'ADMIN',
       isVerified: 'true',
       isLogin: 'false',
