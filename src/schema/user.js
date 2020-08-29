@@ -3,11 +3,11 @@ import { gql } from 'apollo-server-express';
 export default gql`
   extend type Query {
     users: [User!]
-    searchUsers(userName: String!, role: String, isOnline: Boolean, isAdvisor: Boolean): RoleUser!
+    searchUsers(userId: String! ,userName: String!, role: String, isOnline: Boolean, isAdvisor: Boolean): RoleUser!
     user(id: ID!): User    
-    getAllAdvisorForUser: RoleUser!
+    getAllAdvisorForUser(userId: String!): RoleUser!
     getAllAdvisorForAdmin(userId: String!, isApproved: Boolean!): RoleUser!    
-    getAllAdvisor(categoryName: String,  orderTypeName: String, advisorName: String): AdvisorResultArray!
+    getAllAdvisor(userId: String!, categoryName: String,  orderTypeName: String, advisorName: String): AdvisorResultArray!
     me: User
   }
 

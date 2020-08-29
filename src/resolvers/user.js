@@ -38,7 +38,7 @@ const sendOtpEmail = (user, otp) => {
     subject: 'Sending Email using Node.js ' + otp,
     text: 'That was easy! ' + otp
   };
-  console.log('otp', user.email)
+  // console.log('otp', user.email)
   transporter.sendMail(mailOptions, function (error, info) {
     if (error) {
       console.log(error);
@@ -121,7 +121,6 @@ let getUserByCategoryName = async (categoryName) => {
       categoryName: categoryName
     },
   });
-  // console.log('userCategory', userCategory)
   if (userCategory) {
     let userss = [];
     for (var i in userCategory) {
@@ -161,7 +160,6 @@ let getUserByorderTypeName = async (orderTypeName) => {
 
       userss.push(user);
     }
-    console.log('userss', userss.length)
     return userss;
   } else {
     return null;
@@ -178,7 +176,6 @@ let getUserByAdvisorName = async (advisorName) => {
       role: 'ADVISOR', isApproved: true,
     },
   })
-  console.log('user', user.length)
   return user;
 };
 
@@ -203,21 +200,16 @@ function check_duplicates(a, b) {
   for (var i = 0, len = a.length; i < len; i++) {
     for (var j = 0, len2 = b.length; j < len2; j++) {
       if (a[i].id === b[j].id) {
-              /* b.splice(j, 1) */;
         newUserResult.push(b[j]);
-        // console.log('a.length && b.length', a.length, b.length);
-        // console.log('newUserResult', newUserResult.length);
-        // len2 = b.length;
+
       }
     }
   }
-  console.log('newUserResult', newUserResult.length);
   return newUserResult;
 
 }
 
 function checkThree_duplicates(a, b, c) {
-  // console.log('a, b, c', a.length, b.length, c.length)
   var asd = []; var newUserResult = []
   for (var i = 0, len = a.length; i < len; i++) {
     for (var j = 0, len2 = b.length; j < len2; j++) {
@@ -228,27 +220,21 @@ function checkThree_duplicates(a, b, c) {
     }
   }
   for (var k = 0, len3 = c.length; k < len3; k++) {
-    // console.log('a, b, c', a.length, b.length, c.length)
     for (var l = 0, len4 = asd.length; l < len4; l++) {
       if (asd[l].id === c[k].id) {
         newUserResult.push(c[k]);
       }
     }
   }
-  // console.log('asd', asd.length);
-  // console.log('newUserResult', newUserResult.length);
   return newUserResult;
 }
 
 let getCategorybyUser = async (userId) => {
-  console.log('id', userId)
   var userCategory = await userCat.UserCategory.findAll({
     where: {
       userId: userId
     },
   });
-
-  // console.log('userCat', userCategory)
   return userCategory
 
 }
@@ -258,7 +244,6 @@ let getOrderTypebyUser = async (userId) => {
       userId: userId
     },
   });
-  // console.log('userOrder', userOrderType)
   return userOrderType
 }
 
@@ -272,19 +257,18 @@ export default {
     //   body,
     //   { models, secret },
     // ) => {
-    searchUsers: async (parent, { userName, role, isOnline, isAdvisor }, { models }) => {
+    searchUsers: async (parent, { userId, userName, role, isOnline, isAdvisor }, { models }) => {
       let user = [];
       var userCategory = [];
       var userOrderType = [];
       if (role && isOnline && isAdvisor) {
-        console.log('role && isOnline && isAdvisor', role, isOnline, isAdvisor)
         user = await models.User.findAll({
           where: {
             userName: {
               [Op.iRegexp]: userName
             },
             role: role, isOnline: isOnline, isAdvisor: isAdvisor,
-            // isApproved: true,
+            isApproved: true,
           },
         })
         if (user.length > 0) {
@@ -296,20 +280,19 @@ export default {
             user[i].orderTypes = userOrderType
 
           }
+          user = user.filter(x => x.id != userId)
           return { user: user, success: true };
         } else {
           return { message: 'No User', success: false }
         }
       }
-      else if (role && isOnline == true) {
-
-        console.log('role && isOnline', role, isOnline)
+      else if (role && isOnline) {
         user = await models.User.findAll({
           where: {
             userName: {
               [Op.iRegexp]: userName
             },
-            role: role, isOnline: isOnline,
+            role: role, isOnline: true,
             isApproved: true,
           },
         })
@@ -323,13 +306,13 @@ export default {
             user[i].orderTypes = userOrderType
 
           }
+          user = user.filter(x => x.id != userId)
           return { user: user, success: true };
         } else {
           return { message: 'No User', success: false }
         }
       }
       else if (role && isAdvisor == true) {
-        console.log('role && isAdvisor', role, isAdvisor)
         user = await models.User.findAll({
           where: {
             userName: {
@@ -340,23 +323,19 @@ export default {
           },
         })
         if (user.length > 0) {
-
-
           for (var i in user) {
-
             userCategory = await getCategorybyUser(user[i].id)
             userOrderType = await getOrderTypebyUser(user[i].id)
             user[i].categories = userCategory
             user[i].orderTypes = userOrderType
-
           }
+          user = user.filter(x => x.id != userId)
           return { user: user, success: true };
         } else {
           return { message: 'No User', success: false }
         }
       }
       else if (role && isOnline == false && isAdvisor == false) {
-        console.log('role && isOnline == false && isAdvisor == false', role, isOnline, isAdvisor)
         user = await models.User.findAll({
           where: {
             userName: {
@@ -367,16 +346,13 @@ export default {
           },
         })
         if (user.length > 0) {
-
-
           for (var i in user) {
-
             userCategory = await getCategorybyUser(user[i].id)
             userOrderType = await getOrderTypebyUser(user[i].id)
             user[i].categories = userCategory
             user[i].orderTypes = userOrderType
-
           }
+          user = user.filter(x => x.id != userId)
           return { user: user, success: true };
         } else {
           return { message: 'No User', success: false }
@@ -384,14 +360,13 @@ export default {
 
       }
       else if (role) {
-        console.log('role', role)
         if (!isOnline) {
           user = await models.User.findAll({
             where: {
               userName: {
                 [Op.iRegexp]: userName
               },
-              role: role, isOnline: false, isApproved: true,
+              role: role, isApproved: true,
             },
           })
         } else if (!isAdvisor) {
@@ -404,25 +379,20 @@ export default {
             },
           })
         }
-
         if (user.length > 0) {
-
-
           for (var i in user) {
-
             userCategory = await getCategorybyUser(user[i].id)
             userOrderType = await getOrderTypebyUser(user[i].id)
             user[i].categories = userCategory
             user[i].orderTypes = userOrderType
-
           }
+          user = user.filter(x => x.id != userId)
           return { user: user, success: true };
         } else {
           return { message: 'No User', success: false }
         }
 
       } else {
-        console.log('else')
         user = await models.User.findAll({
           where: {
             userName: {
@@ -432,17 +402,13 @@ export default {
           },
         })
         if (user.length > 0) {
-
-
           for (var i in user) {
-
             userCategory = await getCategorybyUser(user[i].id)
             userOrderType = await getOrderTypebyUser(user[i].id)
             user[i].categories = userCategory
             user[i].orderTypes = userOrderType
-
           }
-
+          user = user.filter(x => x.id != userId)
           return { user: user, success: true };
 
         } else {
@@ -453,9 +419,14 @@ export default {
 
     },
     user: async (parent, { id }, { models }) => {
-      return await models.User.findById(id);
+      let user = await models.User.findById(id);
+      var userCategory = await getCategorybyUser(user.id)
+      var userOrderType = await getOrderTypebyUser(user.id)
+      user.categories = userCategory
+      user.orderTypes = userOrderType
+      return user
     },
-    getAllAdvisorForUser: async (parent, { }, { models }) => {
+    getAllAdvisorForUser: async (parent, { userId }, { models }) => {
       var user = [];
       let userCategory = [];
       let userOrderType = [];
@@ -464,18 +435,17 @@ export default {
           role: 'ADVISOR',
           isApproved: true
         }
-
       });
 
       if (user.length > 0) {
         for (var i in user) {
-
           userCategory = await getCategorybyUser(user[i].id)
           userOrderType = await getOrderTypebyUser(user[i].id)
           user[i].categories = userCategory
           user[i].orderTypes = userOrderType
 
         }
+        user = user.filter(x => x.id != userId)
         return { user: user, success: true };
       } else {
         return { message: 'No User Found', success: false }
@@ -515,139 +485,99 @@ export default {
       }
     },
 
-    getAllAdvisor: async (parent, { categoryName, orderTypeName, advisorName }, { models }) => {
-      console.log('categoryName, orderTypeName', categoryName, orderTypeName)
-      if (categoryName != null && orderTypeName == null && advisorName == null) {
-        // var userCategory = await models.UserCategory.findAll({
-        //   where: {
-        //     categoryName: categoryName
-        //   },
-        // });
-        // console.log('userCategory', userCategory)
-        // if (userCategory) {
-        //   let userss = [];
-        //   for (var i in userCategory) {
-
-        //     let user = await models.User.find({
-        //       where: {
-        //         id: userCategory[i].userId,
-        //         role: 'ADVISOR', isApproved: false,
-        //       },
-        //     })
-        //     userss.push(user);
-        //   }
-        //   return { user: userss, success: true }
-        // }
-        const user = await getUserByCategoryName(categoryName);
-        if (user.length > 0) {
-          return { user: user, success: true }
-
-        } else {
-          return { message: "No Advisor Found", success: false }
-        }
-      } else if (orderTypeName != null && categoryName == null && advisorName == null) {
-        console.log('this should run')
-
-        // var orderType = await models.UserOrderType.findAll({
-        //   where: {
-        //     orderTypeName: orderTypeName
-        //   },
-        // });
-        // if (orderType) {
-        //   let userss = [];
-        //   for (var i in orderType) {
-
-        //     let user = await models.User.find({
-        //       where: {
-        //         id: orderType[i].userId,
-        //         role: 'ADVISOR', isApproved: false,
-        //       },
-        //     })
-        //     userss.push(user);
-        //   }
-        //   return { user: userss, success: true }
-        // }  
-        const user = await getUserByorderTypeName(orderTypeName)
-
-        if (user.length > 0) {
-          return { user: user, success: true }
-
-        } else {
-          return { message: "No Advisor Found", success: false }
-        }
-        // return { user: user, success: true };
-      } else if (advisorName != null && categoryName == null && orderTypeName == null) {
-        // let user = await models.User.findAll({
-        //   where: {
-        //     userName: {
-        //       [Op.iRegexp]: advisorName
-        //     },
-        //     role: 'ADVISOR', isApproved: false,
-        //   },
-        // })
-        // return { user: user, success: true }
-
-        const user = await getUserByAdvisorName(advisorName)
-        if (user.length > 0) {
-          return { user: user, success: true }
-
-        } else {
-          return { message: "No Advisor Found", success: false }
-        }
-        // return { user: user, success: true };
-      } else if (categoryName != null && advisorName != null && orderTypeName == null) {
-        console.log("categoryName && advisorName && orderTypeName", categoryName && advisorName && orderTypeName)
-
-        const categoryUsers = await getUserByCategoryName(categoryName);
-        const adUser = await getUserByAdvisorName(advisorName);
-
-        var user = await check_duplicates(categoryUsers, adUser);
-        if (user.length > 0) {
-          return { user: user, success: true }
-
-        } else {
-          return { message: "No Advisor Found", success: false }
-        }
-      } else if (orderTypeName != null && advisorName != null && categoryName == null) {
-        console.log("categoryName && advisorName && orderTypeName", categoryName && advisorName && orderTypeName)
-
-        const orderTypeUsers = await getUserByorderTypeName(orderTypeName);
-        const adUser = await getUserByAdvisorName(advisorName);
-        var user = await check_duplicates(orderTypeUsers, adUser);
-        if (user.length > 0) {
-          return { user: user, success: true }
-
-        } else {
-          return { message: "No Advisor Found", success: false }
-        }
-      } else if (orderTypeName != null && categoryName != null && advisorName == null) {
-        console.log("categoryName && advisorName && orderTypeName", categoryName && advisorName && orderTypeName)
-
-        const categoryUsers = await getUserByCategoryName(categoryName);
-        const orderTypeUsers = await getUserByorderTypeName(orderTypeName);
-
-        var user = await check_duplicates(categoryUsers, orderTypeUsers);
-        if (user.length > 0) {
-          return { user: user, success: true }
-
-        } else {
-          return { message: "No Advisor Found", success: false }
-        }
-      } else {
-        console.log('else')
-        console.log("categoryName && advisorName && orderTypeName", categoryName && advisorName && orderTypeName)
-
-        const categoryUsers = await getUserByCategoryName(categoryName);
-        const orderTypeUsers = await getUserByorderTypeName(orderTypeName);
-        const adUser = await getUserByAdvisorName(advisorName);
+    getAllAdvisor: async (parent, { userId, categoryName, orderTypeName, advisorName }, { models }) => {
+      let categoryUsers = [];
+      let orderTypeUsers = [];
+      let adUser = [];
+      if (categoryName) {
+        categoryUsers = await getUserByCategoryName(categoryName);
+      }
+      if (orderTypeName) {
+        orderTypeUsers = await getUserByorderTypeName(orderTypeName);
+      }
+      if (advisorName) {
+        adUser = await getUserByAdvisorName(advisorName);
+      }
+      if (categoryUsers.length > 0 && orderTypeUsers.length > 0 && adUser.length > 0) {
         var user = await checkThree_duplicates(categoryUsers, orderTypeUsers, adUser);
         if (user.length > 0) {
-          return { user: user, success: true }
+          for (var i in user) {
+            let userCategory = await getCategorybyUser(user[i].id)
+            let userOrderType = await getOrderTypebyUser(user[i].id)
+            user[i].categories = userCategory
+            user[i].orderTypes = userOrderType
 
+          }
+          user = user.filter(x => x.id != userId)
+          return { user: user, success: true };
         } else {
-          return { message: "No Advisor Found", success: false }
+          return { message: 'No Advisor Found', success: false }
         }
       }
+      else if (categoryUsers.length > 0 && orderTypeUsers.length > 0) {
+        var user = await check_duplicates(categoryUsers, orderTypeUsers);
+        if (user.length > 0) {
+          for (var i in user) {
+            let userCategory = await getCategorybyUser(user[i].id)
+            let userOrderType = await getOrderTypebyUser(user[i].id)
+            user[i].categories = userCategory
+            user[i].orderTypes = userOrderType
+
+          }
+          user = user.filter(x => x.id != userId)
+          return { user: user, success: true };
+        } else {
+          return { message: 'No Advisor Found', success: false }
+        }
+      }
+      else if (categoryUsers.length > 0 && adUser.length > 0) {
+        var user = await check_duplicates(categoryUsers, adUser);
+        if (user.length > 0) {
+          for (var i in user) {
+            let userCategory = await getCategorybyUser(user[i].id)
+            let userOrderType = await getOrderTypebyUser(user[i].id)
+            user[i].categories = userCategory
+            user[i].orderTypes = userOrderType
+
+          }
+          user = user.filter(x => x.id != userId)
+          return { user: user, success: true };
+        } else {
+          return { message: 'No Advisor Foundzz', success: false }
+        }
+      }
+      else if (orderTypeUsers.length > 0 && adUser.length > 0) {
+        var user = await check_duplicates(orderTypeUsers, adUser);
+        if (user.length > 0) {
+          for (var i in user) {
+            let userCategory = await getCategorybyUser(user[i].id)
+            let userOrderType = await getOrderTypebyUser(user[i].id)
+            user[i].categories = userCategory
+            user[i].orderTypes = userOrderType
+
+          }
+          user = user.filter(x => x.id != userId)
+          return { user: user, success: true };
+        } else {
+          return { message: 'No Advisor Foundzz', success: false }
+        }
+      } else if (categoryUsers.length > 0 || orderTypeUsers.length > 0 || adUser.length > 0) {
+        user = categoryUsers.length > 0 ? categoryUsers : orderTypeUsers.length > 0 ? orderTypeUsers : adUser
+        if (user.length > 0) {
+          for (var i in user) {
+            let userCategory = await getCategorybyUser(user[i].id)
+            let userOrderType = await getOrderTypebyUser(user[i].id)
+            user[i].categories = userCategory
+            user[i].orderTypes = userOrderType
+
+          }
+          user = user.filter(x => x.id != userId)
+          return { user: user, success: true };
+        } else {
+          return { message: 'No Advisor Foundzz', success: false }
+        }
+      }
+    
     },
     me: async (parent, args, { models, me }) => {
       if (!me) {
@@ -876,7 +806,6 @@ export default {
       });
       var userCategory = await getCategorybyUser(user.id)
       var userOrderType = await getOrderTypebyUser(user.id)
-      // console.log('userCat, userOrder', userCategory, userOrderType)
       user.categories = userCategory
       user.orderTypes = userOrderType
       return { token: createToken(user, password, '30m'), user: user, success: true };
@@ -904,7 +833,6 @@ export default {
         await user.update(body);
         var userCategory = await getCategorybyUser(user.id)
         var userOrderType = await getOrderTypebyUser(user.id)
-        // console.log('userCat, userOrder', userCategory, userOrderType)
         user.categories = userCategory
         user.orderTypes = userOrderType
         return { user: user, success: true }
@@ -928,7 +856,6 @@ export default {
         });
         if (newUser) {
           var currentPass = await newUser.validatePassword(currentPassword);
-          console.log('currentPass', currentPass)
           if (!currentPass) {
             return { success: false, message: 'Old password is typed incorrectly...' }
           }
@@ -938,7 +865,6 @@ export default {
           await newUser.update({ password });
           var userCategory = await getCategorybyUser(newUser.id)
           var userOrderType = await getOrderTypebyUser(newUser.id)
-          // console.log('userCat, userOrder', userCategory, userOrderType)
           newUser.categories = userCategory
           newUser.orderTypes = userOrderType
           return { user: newUser, success: true }
@@ -981,7 +907,6 @@ export default {
             await user.update({ isVerified: true });
             var userCategory = await getCategorybyUser(user.id)
             var userOrderType = await getOrderTypebyUser(user.id)
-            // console.log('userCat, userOrder', userCategory, userOrderType)
             user.categories = userCategory
             user.orderTypes = userOrderType
             return { user: user, success: true }
@@ -1012,7 +937,6 @@ export default {
         { models, me }) => {
         const { id, title, userName, image, role, aboutService, aboutMe, isLogin, isAdvisor, isOnline, video,
           categories, orderTypes } = body
-        // console.log('orderTypes', orderTypes)
         var newUser = await models.User.find({
           where: {
             // $or: [
@@ -1030,7 +954,6 @@ export default {
           //   'No user found with this Email.',
           // );
         }
-        console.log("else")
         const user = await models.User.findById(newUser.id);
         // var userCat = "";
 
@@ -1039,7 +962,6 @@ export default {
 
         if (orderTypes) {
           for (var i in orderTypes) {
-            console.log('orderTypes', orderTypes[i])
             // const orderTypessss = await models.OrderType.find({
             //   where: { name: orderTypes[i] },
             // });
@@ -1085,7 +1007,6 @@ export default {
             id: adminId,
           },
         });
-        console.log('adminUser', adminUser)
         if (adminUser.role == 'ADMIN') {
           // return { success: true, message: 'User is Admin' }
           var newUser = await models.User.find({
@@ -1100,7 +1021,6 @@ export default {
                 await user.update({ isApproved: true });
                 var userCategory = await getCategorybyUser(user.id)
                 var userOrderType = await getOrderTypebyUser(user.id)
-                // console.log('userCat, userOrder', userCategory, userOrderType)
                 user.categories = userCategory
                 user.orderTypes = userOrderType
                 return { user: user, success: true }
