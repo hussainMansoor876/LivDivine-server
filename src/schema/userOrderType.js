@@ -16,10 +16,11 @@ export default gql`
 
   input UserOrderTypesss {
     id: String
-    name: String
+    orderTypeName: String
     subTitle: String
     isActive: Boolean
     price: Float
+    userName: String
   }
 
   type UserOrderTypeConnection {

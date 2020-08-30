@@ -21,7 +21,7 @@ export default gql`
     socialSignUp(userName: String!, email: String, authType: String!, authId: String!, image: String ): Token!
     signIn(login: String!, password: String!): Token!
     forgotPassword(id: String!, password: String!, otp: String!): Token!
-    updateUser(id: String!, userName: String, image: String, isLogin: Boolean, isOnline: Boolean, isAdvisor: Boolean, isApproved: Boolean): Token!
+    updateUser(id: String!, userName: String, image: String, isLogin: Boolean, isOnline: Boolean, isAdvisor: Boolean, isApproved: Boolean, aboutMe: String, aboutService: String, title: String): Token!
     updatePassword(id: String!,currentPassword: String, password: String!): Token!
     updateVerified(id: String!): Token!    
     becomeAdvisor(id: String,authId: String,
