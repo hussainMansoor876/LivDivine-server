@@ -283,7 +283,7 @@ export default {
           user = user.filter(x => x.id != userId)
           return { user: user, success: true };
         } else {
-          return { message: 'No User', success: false }
+          return {  user: user, message: 'No User', success: false }
         }
       }
       else if (role && isOnline) {
@@ -309,7 +309,7 @@ export default {
           user = user.filter(x => x.id != userId)
           return { user: user, success: true };
         } else {
-          return { message: 'No User', success: false }
+          return {  user: user, message: 'No User', success: false }
         }
       }
       else if (role && isAdvisor == true) {
@@ -332,7 +332,7 @@ export default {
           user = user.filter(x => x.id != userId)
           return { user: user, success: true };
         } else {
-          return { message: 'No User', success: false }
+          return {  user: user, message: 'No User', success: false }
         }
       }
       else if (role && isOnline == false && isAdvisor == false) {
@@ -355,7 +355,7 @@ export default {
           user = user.filter(x => x.id != userId)
           return { user: user, success: true };
         } else {
-          return { message: 'No User', success: false }
+          return {  user: user, message: 'No User', success: false }
         }
 
       }
@@ -389,7 +389,7 @@ export default {
           user = user.filter(x => x.id != userId)
           return { user: user, success: true };
         } else {
-          return { message: 'No User', success: false }
+          return { user: user, message: 'No User', success: false }
         }
 
       } else {
@@ -412,7 +412,7 @@ export default {
           return { user: user, success: true };
 
         } else {
-          return { message: 'No User', success: false }
+          return {  user: user, message: 'No User', success: false }
         }
       }
       // let searchFor = body.userName
@@ -486,6 +486,7 @@ export default {
     },
 
     getAllAdvisor: async (parent, { userId, categoryName, orderTypeName, advisorName }, { models }) => {
+      let user = []
       let categoryUsers = [];
       let orderTypeUsers = [];
       let adUser = [];
@@ -497,9 +498,10 @@ export default {
       }
       if (advisorName) {
         adUser = await getUserByAdvisorName(advisorName);
+        // console.log('adUser', adUser)
       }
       if (categoryUsers.length > 0 && orderTypeUsers.length > 0 && adUser.length > 0) {
-        var user = await checkThree_duplicates(categoryUsers, orderTypeUsers, adUser);
+        user = await checkThree_duplicates(categoryUsers, orderTypeUsers, adUser);
         if (user.length > 0) {
           for (var i in user) {
             let userCategory = await getCategorybyUser(user[i].id)
@@ -511,11 +513,11 @@ export default {
           user = user.filter(x => x.id != userId)
           return { user: user, success: true };
         } else {
-          return { message: 'No Advisor Found', success: false }
+          return { user: user, message: 'No Advisor Found', success: false }
         }
       }
       else if (categoryUsers.length > 0 && orderTypeUsers.length > 0) {
-        var user = await check_duplicates(categoryUsers, orderTypeUsers);
+        user = await check_duplicates(categoryUsers, orderTypeUsers);
         if (user.length > 0) {
           for (var i in user) {
             let userCategory = await getCategorybyUser(user[i].id)
@@ -527,11 +529,11 @@ export default {
           user = user.filter(x => x.id != userId)
           return { user: user, success: true };
         } else {
-          return { message: 'No Advisor Found', success: false }
+          return { user: user, message: 'No Advisor Found', success: false }
         }
       }
       else if (categoryUsers.length > 0 && adUser.length > 0) {
-        var user = await check_duplicates(categoryUsers, adUser);
+        user = await check_duplicates(categoryUsers, adUser);
         if (user.length > 0) {
           for (var i in user) {
             let userCategory = await getCategorybyUser(user[i].id)
@@ -543,11 +545,11 @@ export default {
           user = user.filter(x => x.id != userId)
           return { user: user, success: true };
         } else {
-          return { message: 'No Advisor Foundzz', success: false }
+          return { user: user, message: 'No Advisor Found', success: false }
         }
       }
       else if (orderTypeUsers.length > 0 && adUser.length > 0) {
-        var user = await check_duplicates(orderTypeUsers, adUser);
+        user = await check_duplicates(orderTypeUsers, adUser);
         if (user.length > 0) {
           for (var i in user) {
             let userCategory = await getCategorybyUser(user[i].id)
@@ -559,7 +561,7 @@ export default {
           user = user.filter(x => x.id != userId)
           return { user: user, success: true };
         } else {
-          return { message: 'No Advisor Foundzz', success: false }
+          return { user: user, message: 'No Advisor Found', success: false }
         }
       } else if (categoryUsers.length > 0 || orderTypeUsers.length > 0 || adUser.length > 0) {
         user = categoryUsers.length > 0 ? categoryUsers : orderTypeUsers.length > 0 ? orderTypeUsers : adUser
@@ -574,8 +576,11 @@ export default {
           user = user.filter(x => x.id != userId)
           return { user: user, success: true };
         } else {
-          return { message: 'No Advisor Foundzz', success: false }
+          return { user: user, message: 'No Advisor Found', success: false }
         }
+      } else {
+        console.log('else')
+        return { user: user, message: 'No Advisor Found', success: false }
       }
     
     },
