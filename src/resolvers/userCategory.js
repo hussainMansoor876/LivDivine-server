@@ -142,12 +142,14 @@ export default {
           userId: userId,
         },
       });
+      console.log('userCat', userCat.length)
       if (!userCat) {
 
         return { message: "No Category Found", success: false }
       } else {
         for (var i in userCat) {
-          await models.UserCategory.destroy({ where: { id: userCat[i].id } });
+          var feedback = await models.UserCategory.destroy({ where: { id: userCat[i].id } });
+          console.log('feedback', feedback)
         }
       }
 
